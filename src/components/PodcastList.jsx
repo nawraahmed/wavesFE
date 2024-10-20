@@ -7,6 +7,37 @@ const PodcastList = () => {
   const [error, setError] = useState(null)
   const apiKey = import.meta.env.VITE_API_KEY
 
+  // Function to add a podcast to the backend with token
+  const handleAddPodcast = async (podcast) => {
+    try {
+      // Extract fields from the podcast object and map them to your model
+      const mappedPodcast = {
+        externalId: podcast.podcast.id,
+        title: podcast.title_original,
+        description: podcast.description_original,
+        thumbnail: podcast.thumbnail,
+        genre_ids: podcast.genre_ids
+      }
+
+      console.log(mappedPodcast)
+
+      // Send the mapped podcast data to your backend
+      const token = localStorage.getItem('authToken')
+      const res = await axios.post(
+        'http://localhost:4000/addpodcast',
+        mappedPodcast,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+      console.log('Podcast added:', res.data)
+    } catch (error) {
+      console.error('Error adding podcast:', error)
+    }
+  }
+
   const fetchPodcasts = async () => {
     const searchTerm = 'podcast'
     try {
@@ -60,7 +91,7 @@ const PodcastList = () => {
               />
               <div className="podcast-buttons">
                 <button className="like-button">❤️ Like</button>
-                <button className="add-button">➕ Add</button>
+                <button onClick={() => handleAddPodcast(podcast)}>Add</button>
               </div>
             </div>
             <div className="podcast-title">{podcast.title_original}</div>
