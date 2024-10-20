@@ -1,7 +1,13 @@
-import './App.css'
+// App.jsx
+import React from 'react';
+import PodcastList from './components/PodcastList';
 
 const App = () => {
-  return <></>
-}
+  return (
+    <div>
+      <PodcastList />
+    </div>
+  );
+};
 
-export default App
+export default App;
