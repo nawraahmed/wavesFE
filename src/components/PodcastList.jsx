@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react'
+import { useAudio } from '../contexts/AudioContext'
 import axios from 'axios'
 
-const PodcastList = () => {
+const PodcastList = ({ setCurrentTrack, navigate }) => {
   const [podcasts, setPodcasts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const apiKey = import.meta.env.VITE_API_KEY
+  const { playTrack } = useAudio()
 
-  // Function to add a podcast to the backend with token
   const handleAddPodcast = async (podcast) => {
     try {
-      // Extract fields from the podcast object and map them to your model
       const mappedPodcast = {
         externalId: podcast.podcast.id,
         title: podcast.title_original,
@@ -18,10 +18,6 @@ const PodcastList = () => {
         thumbnail: podcast.thumbnail,
         genre_ids: podcast.genre_ids
       }
-
-      console.log(mappedPodcast)
-
-      // Send the mapped podcast data to your backend
       const token = localStorage.getItem('authToken')
       const res = await axios.post(
         'http://localhost:4000/addpodcast',
@@ -51,8 +47,6 @@ const PodcastList = () => {
       )
 
       const data = response.data
-      console.log(data)
-
       if (data.results.length === 0) {
         setError('No more podcasts found.')
       } else {
@@ -62,6 +56,45 @@ const PodcastList = () => {
       setError('Error fetching podcasts: ' + error.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchEpisodes = async (podcastId) => {
+    try {
+      const response = await axios.get(
+        `https://listen-api.listennotes.com/api/v2/podcasts/${podcastId}`,
+        {
+          headers: {
+            'X-ListenAPI-Key': apiKey
+          }
+        }
+      )
+      const podcastDetails = response.data
+      const episodes = podcastDetails.episodes
+      console.log(episodes)
+      if (episodes.length > 0) {
+        setCurrentTrack(episodes[0]) // Set the first episode as current track
+        console.log(episodes[0])
+      } else {
+        console.log('No episodes found for this podcast')
+      }
+    } catch (error) {
+      console.error('Error fetching episodes: ' + error.message)
+    }
+  }
+
+  // const handleSelectPodcast = async (podcast) => {
+  //   await fetchEpisodes(podcast.podcast.id) // Fetch episodes
+  //   navigate('/currently-playing') // Navigate to CurrentlyPlaying
+  // }
+
+  const handlePlayClick = async (podcast) => {
+    // Fetch episodes and play the first one, then navigate
+    await fetchEpisodes(podcast.podcast.id) // Fetch episodes
+    const track = podcasts.find((p) => p.podcast.id === podcast.podcast.id)
+    if (track) {
+      playTrack(track)
+      navigate('/currently-playing') // Navigate to CurrentlyPlaying after playing
     }
   }
 
@@ -92,6 +125,7 @@ const PodcastList = () => {
               <div className="podcast-buttons">
                 <button className="like-button">❤️ Like</button>
                 <button onClick={() => handleAddPodcast(podcast)}>Add</button>
+                <button onClick={() => handlePlayClick(podcast)}>Play</button>
               </div>
             </div>
             <div className="podcast-title">{podcast.title_original}</div>
