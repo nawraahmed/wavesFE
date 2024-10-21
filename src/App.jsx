@@ -12,10 +12,12 @@ import WatchHistory from './components/WatchHistory'
 import Footer from './components/Footer'
 import Home from './components/Home'
 import PodcastList from './components/PodcastList'
+import PodcastDetails from './components/PodcastDetails'
 // import Dashboard from './components/Dashboard'
 
 const App = () => {
   const [user, setUser] = useState(null)
+  const [currentTrack, setCurrentTrack] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -42,11 +44,23 @@ const App = () => {
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/currently-playing" element={<CurrentlyPlaying />} />
+        <Route
+          path="/currently-playing"
+          element={<CurrentlyPlaying track={currentTrack} />}
+        />
         <Route path="/favorites" element={<FavoritesList />} />
         <Route path="/history" element={<WatchHistory />} />
-        <Route path="/podcastList" element={<PodcastList />} />
+        <Route
+          path="/podcastList"
+          element={
+            <PodcastList
+              setCurrentTrack={setCurrentTrack}
+              navigate={navigate}
+            />
+          } // Pass setCurrentTrack and navigate to PodcastList
+        />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+        <Route path="/podcast/:podcastId" element={<PodcastDetails />} />
       </Routes>
       <Footer />
     </div>
