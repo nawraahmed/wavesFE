@@ -34,30 +34,44 @@ const Login = ({ setUser }) => {
   }
 
   return (
-    <div className="login">
-      <h2>Login</h2>
-      {error && <p className="error">{error}</p>}{' '}
-      {/* Display error message if exists */}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="email" // Set name attribute for controlled input
-          placeholder="Username/Email"
-          value={formValues.email} // Bind to state
-          onChange={handleChange} // Handle change
-        />
-        <input
-          type="password"
-          name="password" // Set name attribute for controlled input
-          placeholder="Password"
-          value={formValues.password} // Bind to state
-          onChange={handleChange} // Handle change
-        />
-        <button type="submit">Login</button>{' '}
-        {/* Use type="submit" to trigger form submission */}
-      </form>
-    </div>
-  )
-}
+    <div className="signup col">
+      <div className="card-overlay centered">
+        <h2>Login</h2>
+        {error && <p className="error">{error}</p>}
+        <form className="col" onSubmit={handleSubmit}>
+          <div className="input-wrapper">
+            <label htmlFor="email">Email</label>
+            <input
+              type="text"
+              name="email"
+              placeholder="Username/Email"
+              value={formValues.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-export default Login
+          <div className="input-wrapper">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formValues.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <button className="btn" type="submit">Login</button>
+        </form>
+
+        <p>
+          Don't have an account? <a href="/register">Register here</a>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
