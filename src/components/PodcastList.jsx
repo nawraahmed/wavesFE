@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAudio } from '../contexts/AudioContext'
+import { FaPlay } from 'react-icons/fa'
 import axios from 'axios'
 
 const PodcastList = ({ setCurrentTrack, navigate }) => {
@@ -35,7 +37,10 @@ const PodcastList = ({ setCurrentTrack, navigate }) => {
   }
 
   const fetchPodcasts = async () => {
-    const searchTerm = 'podcast'
+    const searchTerm = 're'
+    setLoading(true)
+    setError(null)
+
     try {
       const response = await axios.get(
         `https://listen-api.listennotes.com/api/v2/search?q=${searchTerm}`,
@@ -47,13 +52,17 @@ const PodcastList = ({ setCurrentTrack, navigate }) => {
       )
 
       const data = response.data
+      console.log(data)
+
       if (data.results.length === 0) {
-        setError('No more podcasts found.')
+        setError('No podcasts found for your search.')
+        setPodcasts([])
       } else {
         setPodcasts(data.results)
       }
     } catch (error) {
       setError('Error fetching podcasts: ' + error.message)
+      setPodcasts([])
     } finally {
       setLoading(false)
     }
@@ -83,10 +92,9 @@ const PodcastList = ({ setCurrentTrack, navigate }) => {
     }
   }
 
-  // const handleSelectPodcast = async (podcast) => {
-  //   await fetchEpisodes(podcast.podcast.id) // Fetch episodes
-  //   navigate('/currently-playing') // Navigate to CurrentlyPlaying
-  // }
+  const handlePodcastClick = (podcastId) => {
+    navigate(`/podcast/${podcastId}`) // Navigate to Podcast Details page with podcast ID
+  }
 
   const handlePlayClick = async (podcast) => {
     // Fetch episodes and play the first one, then navigate
@@ -121,11 +129,22 @@ const PodcastList = ({ setCurrentTrack, navigate }) => {
                 src={podcast.thumbnail}
                 alt={`${podcast.title_original} thumbnail`}
                 className="podcast-thumbnail"
+                onClick={() => handlePodcastClick(podcast.podcast.id)}
               />
               <div className="podcast-buttons">
                 <button className="like-button">❤️ Like</button>
-                <button onClick={() => handleAddPodcast(podcast)}>Add</button>
-                <button onClick={() => handlePlayClick(podcast)}>Play</button>
+                <button
+                  className="add-button"
+                  onClick={() => handleAddPodcast(podcast)}
+                >
+                  Add
+                </button>
+                <button
+                  className="play-button"
+                  onClick={() => handlePlayClick(podcast)}
+                >
+                  <FaPlay /> {/* Play icon */}
+                </button>
               </div>
             </div>
             <div className="podcast-title">{podcast.title_original}</div>

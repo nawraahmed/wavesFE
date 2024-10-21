@@ -10,7 +10,7 @@ const Home = () => {
           </NavLink>
         </div>
         <div className="home-image">
-          <img src="public/home-image.png" alt="Search Icon" />
+          <img src="/home-image.png" alt="Search Icon" />
         </div>
       </div>
     </div>

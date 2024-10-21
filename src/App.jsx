@@ -12,6 +12,7 @@ import WatchHistory from './components/WatchHistory'
 import Footer from './components/Footer'
 import Home from './components/Home'
 import PodcastList from './components/PodcastList'
+import PodcastDetails from './components/PodcastDetails'
 // import Dashboard from './components/Dashboard'
 
 const App = () => {
@@ -59,6 +60,7 @@ const App = () => {
           } // Pass setCurrentTrack and navigate to PodcastList
         />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+        <Route path="/podcast/:podcastId" element={<PodcastDetails />} />
       </Routes>
       <Footer />
     </div>
