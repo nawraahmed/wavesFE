@@ -320,6 +320,86 @@ h3 {
 .podcast-info {
   margin-top: 10px;
 }
+
+/* Signup/in Container */
+.signup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Full height */
+}
+
+/* Card Overlay */
+.card-overlay {
+  background: rgba(0, 0, 0, 0.75); 
+  padding: 50px; 
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); 
+  max-width: 500px; 
+  width: 90%; 
+}
+
+/* Input Wrapper */
+.input-wrapper {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-wrapper label {
+  color: #b3b3b3; /* Light grey label text */
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.input-wrapper input {
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+  background-color: #333; /* Dark input background */
+  color: #fff;
+  font-size: 16px;
+}
+
+.input-wrapper input::placeholder {
+  color: #b3b3b3; /* Grey placeholder text */
+}
+
+.input-wrapper input:focus {
+  outline: none;
+  border: 1px solid #1db954; /* Spotify green on focus */
+}
+
+/* Button Styling */
+.btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 25px;
+  background-color: #1db954; /* Spotify green */
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #1aa34a; /* Darker green on hover */
+}
+
+.btn:disabled {
+  background-color: #444; /* Disabled button */
+  cursor: not-allowed;
+}
+
+/* Error and Success Messages */
+p {
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+p a {
 /* Podcast Details! */
 .podcast-details-container {
   max-width: 1200px;
@@ -424,9 +504,17 @@ a {
   text-decoration: none;
 }
 
-a:hover {
+p a:hover {
   text-decoration: underline;
+   color: #1aa34a;
+  }
+
+/* Link Styling */
+p a {
+  font-weight: bold;
+  transition: color 0.3s;
 }
+
 
 h2 {
   font-size: 2rem;
@@ -446,3 +534,4 @@ h4 {
   font-size: 1.1rem;
   margin-bottom: 5px;
 }
+
