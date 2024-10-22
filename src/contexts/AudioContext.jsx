@@ -1,49 +1,56 @@
-import { createContext, useState, useContext, useRef, useEffect } from 'react'
+import { createContext, useState, useEffect, useContext } from 'react'
 
 const AudioContext = createContext()
 
 export const AudioProvider = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState(null)
   const [isPlaying, setIsPlaying] = useState(false)
-  const audioRef = useRef(new Audio())
+  const [audio] = useState(new Audio())
+
+  useEffect(() => {
+    // This will clean up the audio instance when the component unmounts
+    return () => {
+      audio.pause()
+      audio.src = ''
+    }
+  }, [audio])
 
   useEffect(() => {
     if (currentTrack) {
-      console.log('Current track available on render:', currentTrack)
-    } else {
-      console.log('No current track on render')
+      audio.src = currentTrack.audio // Set audio source
+      isPlaying ? audio.play() : audio.pause() // Play or pause based on state
+
+      audio.onended = () => {
+        setIsPlaying(false) // Reset playing state when the track ends
+        setCurrentTrack(null) // Optionally clear current track when done
+      }
+
+      console.log('Current track available:', currentTrack)
     }
-  }, [currentTrack]) // This will track when currentTrack is set or updated
+  }, [currentTrack, isPlaying, audio])
 
   const playTrack = (track) => {
-    if (currentTrack && currentTrack.url === track.url) {
-      // If the same track is clicked, just toggle play/pause
+    if (currentTrack && currentTrack.audio === track.audio) {
+      // If the track is already playing, toggle play/pause
       if (isPlaying) {
         pauseTrack()
       } else {
-        audioRef.current.play()
+        audio.play()
         setIsPlaying(true)
       }
     } else {
-      audioRef.current.src = track.audio
-      audioRef.current.play()
+      // Stop the previous track if it's different
+      audio.pause()
       setCurrentTrack(track)
-      console.log('Setting current track:', track) // Add this log
+      audio.play()
       setIsPlaying(true)
+      console.log('Setting new current track:', track)
     }
   }
 
   const pauseTrack = () => {
-    audioRef.current.pause()
+    audio.pause()
     setIsPlaying(false)
-  }
-
-  const nextTrack = () => {
-    // Logic to get the next track (you might want to implement this based on an array of episodes)
-  }
-
-  const previousTrack = () => {
-    // Logic to get the previous track (similar to nextTrack)
   }
 
   return (
@@ -52,9 +59,7 @@ export const AudioProvider = ({ children }) => {
         currentTrack,
         isPlaying,
         playTrack,
-        pauseTrack,
-        nextTrack,
-        previousTrack
+        pauseTrack
       }}
     >
       {children}

@@ -23,22 +23,52 @@ h3 {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background-color: #1a1d2e;
-  border-bottom: 1px solid #333;
+  background-color: #1a1d2e; /* Dark background like Spotify */
+  color: #fff; /* White text */
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); */
 }
 
-.header h1 {
-  color: #fff;
+.app-title {
+  font-size: 1.8rem;
+  font-weight: bold;
 }
 
-.header nav a {
-  margin-left: 20px;
-  color: #fff;
+.nav-links {
+  display: flex;
+  align-items: center;
+}
+
+.nav-link {
+  color: #b3b3b3; /* Muted color for links */
+  text-decoration: none;
+  margin: 0 15px;
+  font-size: 1rem;
+  position: relative;
+  padding: 5px 0;
+}
+
+.nav-link:hover,
+.active-link {
+  color: #1db954; /* Spotify green on hover */
   text-decoration: none;
 }
 
-.header nav a:hover {
-  text-decoration: underline;
+.sign-in-btn {
+  background-color: #1db954; /* Spotify green */
+  color: #fff; /* White text */
+  border: none;
+  padding: 8px 15px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.sign-in-btn:hover {
+  background-color: #1aa34a; /* Darker green on hover */
+}
+
+button {
+  font-size: 1rem;
 }
 
 /* Search Bar */

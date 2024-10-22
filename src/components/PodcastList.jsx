@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAudio } from '../contexts/AudioContext'
 import { FaPlay } from 'react-icons/fa'
+import { fetchPodcastsMock } from '../mockApi/mockApi'
 import axios from 'axios'
 
-const PodcastList = ({ setCurrentTrack, navigate }) => {
+const PodcastList = ({ navigate }) => {
   const [podcasts, setPodcasts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -14,7 +14,7 @@ const PodcastList = ({ setCurrentTrack, navigate }) => {
   const handleAddPodcast = async (podcast) => {
     try {
       const mappedPodcast = {
-        externalId: podcast.podcast.id, // Ensure this matches the property you're using
+        externalId: podcast.podcast.id,
         title: podcast.title_original,
         description: podcast.description_original,
         thumbnail: podcast.thumbnail,
@@ -39,8 +39,8 @@ const PodcastList = ({ setCurrentTrack, navigate }) => {
 
   const handleFavoritePodcast = async (podcast) => {
     const token = localStorage.getItem('authToken')
-    const podcastId = podcast.podcast.id || podcast.externalId // Use the appropriate ID
-    console.log('Podcast ID:', podcastId) // Log the ID for debugging
+    const podcastId = podcast.podcast.id || podcast.externalId
+    console.log('Podcast ID:', podcastId)
 
     // Validate the podcastId
     if (!podcastId || typeof podcastId !== 'string') {
@@ -93,34 +93,16 @@ const PodcastList = ({ setCurrentTrack, navigate }) => {
         setPodcasts(data.results)
       }
     } catch (error) {
-      setError('Error fetching podcasts: ' + error.message)
-      setPodcasts([])
+      if (error.response && error.response.status === 429) {
+        console.warn('Rate limit exceeded, switching to mock data')
+        const mockData = await fetchPodcastsMock() // Fetch mock data on rate limit
+        setPodcasts(mockData)
+      } else {
+        setError('Error fetching podcasts: ' + error.message)
+        setPodcasts([])
+      }
     } finally {
       setLoading(false)
-    }
-  }
-
-  const fetchEpisodes = async (podcastId) => {
-    try {
-      const response = await axios.get(
-        `https://listen-api.listennotes.com/api/v2/podcasts/${podcastId}`,
-        {
-          headers: {
-            'X-ListenAPI-Key': apiKey
-          }
-        }
-      )
-      const podcastDetails = response.data
-      const episodes = podcastDetails.episodes
-      console.log(episodes)
-      if (episodes.length > 0) {
-        setCurrentTrack(episodes[0]) // Set the first episode as current track
-        console.log(episodes[0])
-      } else {
-        console.log('No episodes found for this podcast')
-      }
-    } catch (error) {
-      console.error('Error fetching episodes: ' + error.message)
     }
   }
 
@@ -129,13 +111,15 @@ const PodcastList = ({ setCurrentTrack, navigate }) => {
   }
 
   const handlePlayClick = async (podcast) => {
-    // Fetch episodes and play the first one, then navigate
-    await fetchEpisodes(podcast.podcast.id) // Fetch episodes
-    const track = podcasts.find((p) => p.podcast.id === podcast.podcast.id)
-    if (track) {
-      playTrack(track)
-      navigate('/currently-playing') // Navigate to CurrentlyPlaying after playing
-    }
+    const podcastId = podcast.podcast.id // Get the podcast ID
+
+    // Hardcoded audio URL for testing
+    const hardcodedAudioUrl =
+      'https://audio.listennotes.com/e/p/0e8f68f851394349afa9a7dbadfb35b7/' // Replace with your desired audio URL
+
+    // Use the hardcoded audio URL to play the track
+    playTrack({ audio: hardcodedAudioUrl, title: 'Hardcoded Episode Title' }) // Replace 'Hardcoded Episode Title' as needed
+    navigate('/currently-playing') // Navigate to currently playing page
   }
 
   useEffect(() => {
@@ -158,7 +142,7 @@ const PodcastList = ({ setCurrentTrack, navigate }) => {
           <div className="podcast-card" key={`${podcast.id}-${index}`}>
             <div className="podcast-image-container">
               <img
-                src={podcast.thumbnail}
+                src={podcast.podcast.thumbnail}
                 alt={`${podcast.title_original} thumbnail`}
                 className="podcast-thumbnail"
                 onClick={() => handlePodcastClick(podcast.podcast.id)}
@@ -182,7 +166,9 @@ const PodcastList = ({ setCurrentTrack, navigate }) => {
                 </button>
               </div>
             </div>
-            <div className="podcast-title">{podcast.title_original}</div>
+            <div className="podcast-title">
+              {podcast.podcast.title_original}
+            </div>
           </div>
         ))}
       </div>

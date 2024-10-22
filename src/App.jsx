@@ -14,11 +14,12 @@ import Home from './components/Home'
 import PodcastList from './components/PodcastList'
 import PodcastDetails from './components/PodcastDetails'
 // import Dashboard from './components/Dashboard'
+import { useAudio } from './contexts/AudioContext'
 
 const App = () => {
   const [user, setUser] = useState(null)
-  const [currentTrack, setCurrentTrack] = useState(null)
   const navigate = useNavigate()
+  const { currentTrack } = useAudio()
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user')
@@ -52,12 +53,7 @@ const App = () => {
         <Route path="/history" element={<WatchHistory />} />
         <Route
           path="/podcastList"
-          element={
-            <PodcastList
-              setCurrentTrack={setCurrentTrack}
-              navigate={navigate}
-            />
-          } // Pass setCurrentTrack and navigate to PodcastList
+          element={<PodcastList navigate={navigate} />}
         />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         <Route path="/podcast/:podcastId" element={<PodcastDetails />} />
