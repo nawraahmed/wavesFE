@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAudio } from '../contexts/AudioContext'
 import { FaPlay, FaDownload } from 'react-icons/fa'
+import { mockPodcastDetails } from '../mockApi/mockApi'
 import axios from 'axios'
 
 const PodcastDetails = () => {
@@ -37,7 +38,13 @@ const PodcastDetails = () => {
       setPodcast(response.data)
       setEpisodes(response.data.episodes)
     } catch (error) {
-      setError('Error fetching podcast details: ' + error.message)
+      if (error.response && error.response.status === 429) {
+        // Fallback to mock data if status is 429
+        setPodcast(mockPodcastDetails)
+        setEpisodes(mockPodcastDetails.episodes)
+      } else {
+        setError('Error fetching podcast details: ' + error.message)
+      }
     } finally {
       setLoading(false)
     }
