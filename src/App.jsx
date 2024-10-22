@@ -27,16 +27,6 @@ const App = () => {
       setUser(JSON.parse(storedUser))
     }
   }, [])
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    const body = document.body;
-    if (darkMode) {
-      body.classList.add('dark-mode');
-    } else {
-      body.classList.remove('dark-mode');
-    }
-  }, [darkMode]);  
 
   const handleLogOut = () => {
     setUser(null)
@@ -50,9 +40,6 @@ const App = () => {
 
       {/* all the needed routes for the app */}
       <Routes>
-      <button onClick={() => setDarkMode(!darkMode)}>
-        {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-      </button>
         <Route path="/" element={<Home />} />
         <Route path="/discover" element={<Discover />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
@@ -76,4 +63,4 @@ const App = () => {
   )
 }
 
-export default App;
+export default App
