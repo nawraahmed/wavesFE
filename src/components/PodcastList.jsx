@@ -118,7 +118,12 @@ const PodcastList = ({ navigate }) => {
       'https://audio.listennotes.com/e/p/0e8f68f851394349afa9a7dbadfb35b7/' // Replace with your desired audio URL
 
     // Use the hardcoded audio URL to play the track
-    playTrack({ audio: hardcodedAudioUrl, title: 'Hardcoded Episode Title' }) // Replace 'Hardcoded Episode Title' as needed
+    playTrack({
+      audio: hardcodedAudioUrl,
+      title: 'Hardcoded Episode Title',
+      thumbnail:
+        'https://cdn-images-3.listennotes.com/podcasts/sivan-says-taking-the-torah-personally-NsxhDfT1LKi-u5JpkIDUH34.300x300.jpg'
+    }) // Replace 'Hardcoded Episode Title' as needed
     navigate('/currently-playing') // Navigate to currently playing page
   }
 
