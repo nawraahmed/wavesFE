@@ -564,3 +564,70 @@ h4 {
   margin-bottom: 5px;
 }
 
+
+/* Discover.css */
+
+.discover-container {
+  padding: 10px; /* Reduced padding */
+}
+
+.discover-title {
+  font-size: 24px; /* Title size */
+  color: #fff;
+  margin-bottom: 10px; /* Margin */
+  text-align: center; /* Center the title */
+}
+
+.error-message {
+  color: red;
+  text-align: center; /* Center error message */
+  margin-bottom: 5px; /* Margin */
+}
+
+.podcast-carousel {
+  display: flex;
+  align-items: center; /* Center the buttons */
+  overflow: hidden; /* Hide overflow for sliding effect */
+  justify-content: center; /* Center the content */
+}
+
+.podcast-results {
+  display: flex;
+  transition: transform 0.5s ease; /* Smooth transition for sliding */
+  width: 100%; /* Ensures the full width is utilized */
+}
+
+.podcast-card {
+  min-width: 150px; /* Card size */
+  margin: 0 5px; /* Spacing between cards */
+  background-color: #333; /* Dark background */
+  border-radius: 8px; /* Rounded corners */
+  padding: 5px; /* Padding */
+  flex-shrink: 0; /* Prevent shrinking */
+  text-align: center; /* Center content inside the card */
+}
+
+.podcast-thumbnail {
+  width: 100%; /* Responsive image */
+  border-radius: 8px; /* Match card corners */
+}
+
+.swap-button {
+  background-color: #1db954; /* Button color */
+  color: white;
+  border: none;
+  padding: 8px 12px; /* Button padding */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer;
+  margin: 0 5px; /* Spacing for buttons */
+  transition: background-color 0.3s;
+}
+
+.swap-button:disabled {
+  background-color: #444; /* Disabled button style */
+  cursor: not-allowed; /* Not allowed cursor */
+}
+
+.swap-button:hover:not(:disabled) {
+  background-color: #1aa34a; /* Darker green on hover */
+}
