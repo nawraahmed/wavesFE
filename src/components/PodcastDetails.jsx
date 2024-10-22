@@ -6,7 +6,7 @@ import { FaPlay, FaDownload } from 'react-icons/fa'
 import { mockPodcastDetails } from '../mockApi/mockApi'
 import axios from 'axios'
 
-const PodcastDetails = () => {
+const PodcastDetails = ({ navigate }) => {
   const { podcastId } = useParams()
   const [episodes, setEpisodes] = useState([])
   const [podcast, setPodcast] = useState(null)
@@ -53,6 +53,7 @@ const PodcastDetails = () => {
 
   const handlePlayEpisode = (episode) => {
     playTrack(episode)
+    navigate('/currently-playing')
   }
 
   const handleDownloadEpisode = async (episode) => {

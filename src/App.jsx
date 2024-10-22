@@ -59,7 +59,10 @@ const App = () => {
           element={<PodcastList navigate={navigate} />}
         />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-        <Route path="/podcast/:podcastId" element={<PodcastDetails />} />
+        <Route
+          path="/podcast/:podcastId"
+          element={<PodcastDetails navigate={navigate} />}
+        />
       </Routes>
       <Footer />
     </div>

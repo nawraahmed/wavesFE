@@ -154,7 +154,7 @@ export const fetchTrendingPodcastsMock = () => {
             title_original: 'The Man in the Black Mask',
             thumbnail:
               'https://cdn-images-3.listennotes.com/podcasts/the-man-in-the-black-mask-nbc-news-vhOEgrapAU6-wfYp9NBa07_.300x300.jpg'
-          },
+          }
         ]
       })
     }, 1000) // Simulate network delay
