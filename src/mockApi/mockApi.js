@@ -85,3 +85,40 @@ export const fetchPodcastDetailsMock = () => {
     }, 1000) // Simulate network delay
   })
 }
+
+//trending podcasts
+
+export const fetchTrendingPodcastsMock = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        podcasts: [
+          {
+            id: 'a7208a3e2a654f999cf78c731824660a',
+            title_original: 'My So-Called Midlife with Reshma Saujani',
+            thumbnail:
+              'https://cdn-images-3.listennotes.com/podcasts/my-so-called-midlife-with-reshma-saujani-Ln0GqrMDh7x-EPzDmBQtdVq.300x300.jpg'
+          },
+          {
+            id: '62eeba8b05c44a829fcf77350bcc690e',
+            title_original: 'The Man in the Black Mask',
+            thumbnail:
+              'https://cdn-images-3.listennotes.com/podcasts/the-man-in-the-black-mask-nbc-news-vhOEgrapAU6-wfYp9NBa07_.300x300.jpg'
+          },
+          {
+            id: 'a7208a3e2a654f999cf78c731824660a',
+            title_original: 'My So-Called Midlife with Reshma Saujani',
+            thumbnail:
+              'https://cdn-images-3.listennotes.com/podcasts/my-so-called-midlife-with-reshma-saujani-Ln0GqrMDh7x-EPzDmBQtdVq.300x300.jpg'
+          },
+          {
+            id: '62eeba8b05c44a829fcf77350bcc690e',
+            title_original: 'The Man in the Black Mask',
+            thumbnail:
+              'https://cdn-images-3.listennotes.com/podcasts/the-man-in-the-black-mask-nbc-news-vhOEgrapAU6-wfYp9NBa07_.300x300.jpg'
+          }
+        ]
+      })
+    }, 1000) // Simulate network delay
+  })
+}

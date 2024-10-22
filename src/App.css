@@ -676,3 +676,7 @@ h4 {
 .swap-button:hover:not(:disabled) {
   background-color: #1aa34a; /* Darker green on hover */
 }
+
+.podcast-title-ss {
+  font-size: 1rem;
+}
