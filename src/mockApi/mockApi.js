@@ -122,3 +122,40 @@ export const fetchTrendingPodcastsMock = () => {
     }, 1000) // Simulate network delay
   })
 }
+
+// mockHistoryData.js
+export const mockHistoryData = {
+  history: [
+    {
+      _id: '1',
+      podcastId: 'abc123',
+      episodeId: 'xyz789',
+      podcastTitle: 'In the Groove, Jazz and Beyond',
+      episodeTitle: 'Episode 1: The Beginning of Jazz',
+      progress: 624, // Progress in seconds
+      totalLength: 1500, // Total length in seconds
+      thumbnail:
+        'https://cdn-images-3.listennotes.com/podcasts/in-the-groove-jazz-and-beyond-ken-laster-Dvj70FPQ6e--rsp9Y3ySVgK.300x300.jpg'
+    },
+    {
+      _id: '2',
+      podcastId: 'def456',
+      episodeId: 'uvw123',
+      podcastTitle: 'Steve & Captain Evil: The Podcast',
+      episodeTitle: 'Episode 5: Adventures of Evil',
+      progress: 930,
+      totalLength: 2100,
+      thumbnail:
+        'https://cdn-images-3.listennotes.com/podcasts/steve-captain-evil-the-podcast-steve-trevino-UxPhWrwSEa0-0oH2E6CYAby.300x300.jpg'
+    }
+  ]
+}
+
+// Function to simulate a delay and return the mock data
+export const fetchHistoryMock = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockHistoryData.history)
+    }, 1000) // Simulate network delay
+  })
+}
