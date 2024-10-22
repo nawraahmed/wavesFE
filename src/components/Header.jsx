@@ -15,6 +15,9 @@ const Header = ({ user, handleLogout }) => {
         <NavLink to="/podcastList" className="active-link">
           Podcast List
         </NavLink>
+        <NavLink to="/history" className="active-link">
+          Watch History
+        </NavLink>
         <NavLink to="/profile" className="active-link">
           Profile
         </NavLink>
