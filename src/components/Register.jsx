@@ -5,7 +5,7 @@ import axios from 'axios'
 const Register = () => {
   const navigate = useNavigate();
   const [formValues, setFormValues] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -27,7 +27,7 @@ const Register = () => {
 
     try {
       const res = await axios.post('http://localhost:4000/auth/register', {
-        name: formValues.name,
+        username: formValues.username,
         email: formValues.email,
         password: formValues.password,
       });
@@ -46,12 +46,12 @@ const Register = () => {
       <h2>Register</h2>
         <form className="col" onSubmit={handleSubmit}>
           <div className="input-wrapper">
-            <label htmlFor="UserName">User Name</label>
+          <label htmlFor="username">Username</label>
             <input
               type="text"
-              name="name"
-              placeholder="Name"
-              value={formValues.name}
+              name="username" 
+              placeholder="Username"
+              value={formValues.username}
               onChange={handleChange}
               required
             />
@@ -103,7 +103,7 @@ const Register = () => {
           <button
             className="btn"
             disabled={
-              !formValues.name ||
+              !formValues.username ||
               !formValues.email ||
               !formValues.password ||
               formValues.password !== formValues.confirmPassword
