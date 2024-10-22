@@ -14,6 +14,8 @@ import Home from './components/Home'
 import PodcastList from './components/PodcastList'
 import PodcastDetails from './components/PodcastDetails'
 // import Dashboard from './components/Dashboard'
+
+//destructuring the currentTrack from useAudio()
 import { useAudio } from './contexts/AudioContext'
 
 const App = () => {
@@ -45,9 +47,10 @@ const App = () => {
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+        {/* passes currentTrack to the component as a prop */}
         <Route
           path="/currently-playing"
-          element={<CurrentlyPlaying track={currentTrack} />}
+          element={<CurrentlyPlaying currentTrack={currentTrack} />}
         />
         <Route path="/favorites" element={<FavoritesList />} />
         <Route path="/history" element={<WatchHistory />} />

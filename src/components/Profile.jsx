@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const Profile = () => {
   const [profile, setProfile] = useState({
     favorites: [],
     playlists: [],
-    podcastlist: [],
-    episodes: [],
-  });
+    addedPodcasts: [],
+    episodes: []
+  })
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -15,71 +16,86 @@ const Profile = () => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`, // Pass token from localStorage
-          },
-        });
-    
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`);
-        }
-    
-        const data = await response.json();
-        setProfile(data); // Set the fetched profile data
-      } catch (error) {
-        console.error('Failed to fetch profile:', error);
-        alert('Error loading profile');
-      }
-    };
-    
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          }
+        })
 
-    fetchProfile();
-  }, []);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`)
+        }
+
+        const data = await response.json()
+        setProfile(data)
+      } catch (error) {
+        console.error('Failed to fetch profile:', error)
+        alert('Error loading profile')
+      }
+    }
+
+    fetchProfile()
+  }, [])
 
   return (
-    <div>
-      <h1>User Profile</h1>
-      <h4>Name:</h4>
-      <p>{profile.username}</p>
-      {/* <section>
-        <h2>Favorites</h2>
-        <ul>
-          {profile.favorites.map((fav) => (
-            <li key={fav.id}>{fav.title}</li>
-          ))}
-        </ul>
-      </section>
+    <div className="profile-container">
+      <div className="profile-header">
+        <h1 className="profile-username">{profile.username}</h1>
+      </div>
 
-      <section>
-        <h2>Playlists</h2>
-        <ul>
-          {profile.playlists.map((playlist) => (
-            <li key={playlist.id}>{playlist.name}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section>
-        <h2>Podcasts</h2>
-        <ul>
-          {profile.podcastlist.map((podcaslist) => (
-            <li key={podcast.externalId}>
-              <h3>{podcast.title}</h3>
-              <p>{podcast.description}</p>
+      <section className="profile-section">
+        <h2 className="section-title">Favorite Podcasts</h2>
+        <ul className="favorites-list">
+          {profile.favorites.map((favorite, index) => (
+            <li className="favorite-item" key={index}>
+              {/* Make thumbnail clickable */}
+              <Link to={`/podcast/${favorite.externalId}`}>
+                <div className="podcast-thumbnail-container">
+                  <img
+                    src={favorite.thumbnail}
+                    alt={`${favorite.title} thumbnail`}
+                    className="podcast-thumbnail"
+                  />
+                </div>
+              </Link>
+              <div className="podcast-info">
+                {/* Make title clickable */}
+                <Link to={`/podcast/${favorite.externalId}`}>
+                  <h3>{favorite.title}</h3>
+                </Link>
+                <p>{favorite.description}</p>
+              </div>
             </li>
           ))}
         </ul>
       </section>
 
-      <section>
-        <h2>Episodes</h2>
-        <ul>
-          {profile.episodes.map((episode) => (
-            <li key={episode.id}>{episode.title}</li>
+      <section className="profile-section">
+        <h2 className="section-title">Added Podcasts</h2>
+        <ul className="favorites-list">
+          {profile.addedPodcasts.map((podcast, index) => (
+            <li className="favorite-item" key={index}>
+              {/* Make thumbnail clickable */}
+              <Link to={`/podcast/${podcast.externalId}`}>
+                <div className="podcast-thumbnail-container">
+                  <img
+                    src={podcast.thumbnail}
+                    alt={`${podcast.title} thumbnail`}
+                    className="podcast-thumbnail"
+                  />
+                </div>
+              </Link>
+              <div className="podcast-info">
+                {/* Make title clickable */}
+                <Link to={`/podcast/${podcast.externalId}`}>
+                  <h3>{podcast.title}</h3>
+                </Link>
+                <p>{podcast.description}</p>
+              </div>
+            </li>
           ))}
         </ul>
-      </section> */}
+      </section>
     </div>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile
