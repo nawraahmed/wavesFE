@@ -154,7 +154,7 @@ export const fetchTrendingPodcastsMock = () => {
             title_original: 'The Man in the Black Mask',
             thumbnail:
               'https://cdn-images-3.listennotes.com/podcasts/the-man-in-the-black-mask-nbc-news-vhOEgrapAU6-wfYp9NBa07_.300x300.jpg'
-          },
+          }
         ]
       })
     }, 1000) // Simulate network delay
@@ -162,38 +162,39 @@ export const fetchTrendingPodcastsMock = () => {
 }
 
 // mockHistoryData.js
-export const mockHistoryData = {
-  history: [
-    {
-      _id: '1',
-      podcastId: 'abc123',
-      episodeId: 'xyz789',
-      podcastTitle: 'In the Groove, Jazz and Beyond',
-      episodeTitle: 'Episode 1: The Beginning of Jazz',
-      progress: 624, // Progress in seconds
-      totalLength: 1500, // Total length in seconds
-      thumbnail:
-        'https://cdn-images-3.listennotes.com/podcasts/in-the-groove-jazz-and-beyond-ken-laster-Dvj70FPQ6e--rsp9Y3ySVgK.300x300.jpg'
-    },
-    {
-      _id: '2',
-      podcastId: 'def456',
-      episodeId: 'uvw123',
-      podcastTitle: 'Steve & Captain Evil: The Podcast',
-      episodeTitle: 'Episode 5: Adventures of Evil',
-      progress: 930,
-      totalLength: 2100,
-      thumbnail:
-        'https://cdn-images-3.listennotes.com/podcasts/steve-captain-evil-the-podcast-steve-trevino-UxPhWrwSEa0-0oH2E6CYAby.300x300.jpg'
-    }
-  ]
-}
 
-// Function to simulate a delay and return the mock data
-export const fetchHistoryMock = () => {
+// Example saveWatchHistory with simulated API call
+export const saveWatchHistory = async (podcastId, progress) => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(mockHistoryData.history)
-    }, 1000) // Simulate network delay
+      resolve({
+        id: podcastId,
+        title: `Podcast Episode ${podcastId}`,
+        progress,
+        timestamp: new Date().toISOString()
+      })
+    }, 1000)
+  })
+}
+
+// Fetch watch history
+export const fetchWatchHistory = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          title: 'Podcast Episode 1',
+          thumbnail: 'https://example.com/thumbnail1.jpg',
+          timestamp: '2024-10-22T12:00:00Z',
+          progress: 120 // seconds
+        },
+        {
+          title: 'Podcast Episode 2',
+          thumbnail: 'https://example.com/thumbnail2.jpg',
+          timestamp: '2024-10-21T15:00:00Z',
+          progress: 300 // seconds
+        }
+      ])
+    }, 1000)
   })
 }
