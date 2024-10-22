@@ -12,16 +12,22 @@ const PodcastList = ({ navigate }) => {
   const { playTrack } = useAudio()
 
   const handleAddPodcast = async (podcast) => {
+    console.log('Attempting to add podcast:', podcast.podcast.id) // Log the ID of the podcast being added
     try {
       const mappedPodcast = {
         externalId: podcast.podcast.id,
-        title: podcast.title_original,
-        description: podcast.description_original,
-        thumbnail: podcast.thumbnail,
-        genre_ids: podcast.genre_ids
+        title: podcast.podcast.title_original,
+        description: podcast.podcast.description_original,
+        thumbnail: podcast.podcast.thumbnail,
+        genre_ids: podcast.podcast.genre_ids
       }
 
       const token = localStorage.getItem('authToken')
+      if (!token) {
+        console.error('No authentication token found. Cannot add podcast.')
+        return // Exit if there's no token
+      }
+
       const res = await axios.post(
         'http://localhost:4000/addpodcast',
         mappedPodcast,
@@ -31,30 +37,44 @@ const PodcastList = ({ navigate }) => {
           }
         }
       )
-      console.log('Podcast added:', res.data)
+
+      console.log('Podcast added successfully:', res.data) // Log the response data after a successful addition
     } catch (error) {
-      console.error('Error adding podcast:', error)
+      // Log the error details if the addition fails
+      if (error.response) {
+        console.error(
+          'Error adding podcast, response data:',
+          error.response.data
+        )
+        console.error('Error status code:', error.response.status)
+        console.error('Error headers:', error.response.headers)
+      } else {
+        console.error('Error adding podcast:', error.message)
+      }
     }
   }
 
   const handleFavoritePodcast = async (podcast) => {
-    const token = localStorage.getItem('authToken')
-    const podcastId = podcast.podcast.id || podcast.externalId
-    console.log('Podcast ID:', podcastId)
-
-    // Validate the podcastId
-    if (!podcastId || typeof podcastId !== 'string') {
-      console.error('Invalid podcast ID:', podcastId)
-      return // Exit the function if the ID is invalid
-    }
-
-    // Check the length of the ID
-    console.log('Podcast ID Length:', podcastId.length)
+    console.log('Attempting to add podcast:', podcast.podcast.id)
 
     try {
+      const mappedPodcast = {
+        externalId: podcast.podcast.id,
+        title: podcast.podcast.title_original,
+        description: podcast.podcast.description_original,
+        thumbnail: podcast.podcast.thumbnail,
+        genre_ids: podcast.podcast.genre_ids
+      }
+
+      const token = localStorage.getItem('authToken')
+      if (!token) {
+        console.error('No authentication token found. Cannot add podcast.')
+        return // Exit if there's no token
+      }
+
       const res = await axios.post(
         'http://localhost:4000/favorite',
-        { podcastId },
+        mappedPodcast,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -63,10 +83,17 @@ const PodcastList = ({ navigate }) => {
       )
       console.log('Podcast favorited:', res.data)
     } catch (error) {
-      console.error(
-        'Error favoriting podcast:',
-        error.response?.data || error.message
-      )
+      // Log the error details if the addition fails
+      if (error.response) {
+        console.error(
+          'Error adding podcast, response data:',
+          error.response.data
+        )
+        console.error('Error status code:', error.response.status)
+        console.error('Error headers:', error.response.headers)
+      } else {
+        console.error('Error adding podcast:', error.message)
+      }
     }
   }
 
@@ -107,7 +134,7 @@ const PodcastList = ({ navigate }) => {
   }
 
   const handlePodcastClick = (podcastId) => {
-    navigate(`/podcast/${podcastId}`) // Navigate to Podcast Details page with podcast ID
+    navigate(`/podcast/c5c512d4b48a42f0acef83dd9615267c`) // Navigate to Podcast Details page with podcast ID
   }
 
   const handlePlayClick = async (podcast) => {

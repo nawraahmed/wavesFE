@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+//gain access to the context values
 import { useAudio } from '../contexts/AudioContext'
 import { FaPlay, FaDownload } from 'react-icons/fa'
 import { mockPodcastDetails } from '../mockApi/mockApi'

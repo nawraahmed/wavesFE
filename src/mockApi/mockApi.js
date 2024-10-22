@@ -3,21 +3,23 @@ export const mockPodcastData = {
     {
       podcast: {
         // Wrap the data inside the `podcast` object
-        id: '96dd1fbf2689446eb019ab9dc2157367',
+        id: '96dd1fbfdhjf2882349eb019ab9dc7157367',
         title_original: 'In the Groove, Jazz and Beyond',
-        publisher: 'First Publisher',
         thumbnail:
-          'https://cdn-images-3.listennotes.com/podcasts/in-the-groove-jazz-and-beyond-ken-laster-Dvj70FPQ6e--rsp9Y3ySVgK.300x300.jpg'
+          'https://cdn-images-3.listennotes.com/podcasts/in-the-groove-jazz-and-beyond-ken-laster-Dvj70FPQ6e--rsp9Y3ySVgK.300x300.jpg',
+        description_original: 'This is a mock description for the podcast.', // Add this mock description
+        genre_ids: ['mock-genre-id'] // Provide a mock genre ID
       }
     },
     {
       podcast: {
         // Wrap the second podcast data as well
-        id: 'cc01c47cc6b545eb8d4456fcae4cc3f0',
+        id: 'cc01c37cc6b54nkjk5ebw5d3756fcae4cc9f0',
         title_original: 'Steve & Captain Evil: The Podcast',
-        publisher: 'Second Publisher',
         thumbnail:
-          'https://cdn-images-3.listennotes.com/podcasts/steve-captain-evil-the-podcast-steve-trevino-UxPhWrwSEa0-0oH2E6CYAby.300x300.jpg'
+          'https://cdn-images-3.listennotes.com/podcasts/steve-captain-evil-the-podcast-steve-trevino-UxPhWrwSEa0-0oH2E6CYAby.300x300.jpg',
+        description_original: 'This is a mock description for the podcast.', // Add this mock description
+        genre_ids: ['mock-genre-id'] // Provide a mock genre ID
       }
     }
   ]
@@ -116,7 +118,43 @@ export const fetchTrendingPodcastsMock = () => {
             title_original: 'The Man in the Black Mask',
             thumbnail:
               'https://cdn-images-3.listennotes.com/podcasts/the-man-in-the-black-mask-nbc-news-vhOEgrapAU6-wfYp9NBa07_.300x300.jpg'
-          }
+          },
+          {
+            id: 'a7208a3e2a654f999cf78c731824660a',
+            title_original: 'My So-Called Midlife with Reshma Saujani',
+            thumbnail:
+              'https://cdn-images-3.listennotes.com/podcasts/my-so-called-midlife-with-reshma-saujani-Ln0GqrMDh7x-EPzDmBQtdVq.300x300.jpg'
+          },
+          {
+            id: '62eeba8b05c44a829fcf77350bcc690e',
+            title_original: 'The Man in the Black Mask',
+            thumbnail:
+              'https://cdn-images-3.listennotes.com/podcasts/the-man-in-the-black-mask-nbc-news-vhOEgrapAU6-wfYp9NBa07_.300x300.jpg'
+          },
+          {
+            id: 'a7208a3e2a654f999cf78c731824660a',
+            title_original: 'My So-Called Midlife with Reshma Saujani',
+            thumbnail:
+              'https://cdn-images-3.listennotes.com/podcasts/my-so-called-midlife-with-reshma-saujani-Ln0GqrMDh7x-EPzDmBQtdVq.300x300.jpg'
+          },
+          {
+            id: '62eeba8b05c44a829fcf77350bcc690e',
+            title_original: 'The Man in the Black Mask',
+            thumbnail:
+              'https://cdn-images-3.listennotes.com/podcasts/the-man-in-the-black-mask-nbc-news-vhOEgrapAU6-wfYp9NBa07_.300x300.jpg'
+          },
+          {
+            id: 'a7208a3e2a654f999cf78c731824660a',
+            title_original: 'My So-Called Midlife with Reshma Saujani',
+            thumbnail:
+              'https://cdn-images-3.listennotes.com/podcasts/my-so-called-midlife-with-reshma-saujani-Ln0GqrMDh7x-EPzDmBQtdVq.300x300.jpg'
+          },
+          {
+            id: '62eeba8b05c44a829fcf77350bcc690e',
+            title_original: 'The Man in the Black Mask',
+            thumbnail:
+              'https://cdn-images-3.listennotes.com/podcasts/the-man-in-the-black-mask-nbc-news-vhOEgrapAU6-wfYp9NBa07_.300x300.jpg'
+          },
         ]
       })
     }, 1000) // Simulate network delay
