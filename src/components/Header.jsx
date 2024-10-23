@@ -11,21 +11,19 @@ const Header = ({ user, handleLogout }) => {
         <NavLink to="/discover" className="nav-link">
           Discover
         </NavLink>
-        <NavLink to="/dashboard" className="nav-link">
-          Dashboard
-        </NavLink>
         <NavLink to="/podcastList" className="nav-link">
           Podcast List
-        </NavLink>
-        <NavLink to="/history" className="active-link">
-          Watch History
         </NavLink>
         <NavLink to="/currently-playing" className="nav-link">
           Currently Playing
         </NavLink>
-        <NavLink to="/profile" className="nav-link">
-          Profile
-        </NavLink>
+
+        {/* Conditionally render Profile link */}
+        {user && (
+          <NavLink to="/profile" className="nav-link">
+            Profile
+          </NavLink>
+        )}
 
         {/* Conditionally render either Sign In or Logout */}
         {user ? (

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAudio } from '../contexts/AudioContext'
 import { FaPlay, FaPlus } from 'react-icons/fa'
 import { fetchPodcastsMock } from '../mockApi/mockApi'
+import { toast } from 'react-toastify'
 import axios from 'axios'
 
 const PodcastList = ({ navigate }) => {
@@ -12,7 +13,7 @@ const PodcastList = ({ navigate }) => {
   const { playTrack } = useAudio()
 
   const handleAddPodcast = async (podcast) => {
-    console.log('Attempting to add podcast:', podcast.podcast.id) // Log the ID of the podcast being added
+    console.log('Attempting to add podcast:', podcast.podcast.id)
     try {
       const mappedPodcast = {
         externalId: podcast.podcast.id,
@@ -38,7 +39,7 @@ const PodcastList = ({ navigate }) => {
         }
       )
 
-      console.log('Podcast added successfully:', res.data) // Log the response data after a successful addition
+      console.log('Podcast added successfully:', res.data)
     } catch (error) {
       // Log the error details if the addition fails
       if (error.response) {
@@ -48,6 +49,13 @@ const PodcastList = ({ navigate }) => {
         )
         console.error('Error status code:', error.response.status)
         console.error('Error headers:', error.response.headers)
+
+        // Check for a 409 status code
+        if (error.response.status === 409) {
+          toast.error('This podcast is already in your list!', {
+            autoClose: 3000 // Auto-close after 3 seconds
+          })
+        }
       } else {
         console.error('Error adding podcast:', error.message)
       }
@@ -91,6 +99,13 @@ const PodcastList = ({ navigate }) => {
         )
         console.error('Error status code:', error.response.status)
         console.error('Error headers:', error.response.headers)
+
+        // Check for a 409 status code
+        if (error.response.status === 409) {
+          toast.error('This podcast is already in your favorites!', {
+            autoClose: 3000 // Auto-close after 3 seconds
+          })
+        }
       } else {
         console.error('Error adding podcast:', error.message)
       }
@@ -101,6 +116,9 @@ const PodcastList = ({ navigate }) => {
     const searchTerm = 're'
     setLoading(true)
     setError(null)
+
+    // Show loading toast notification
+    const loadingToastId = toast.loading('Loading podcasts...') // Start loading notification
 
     try {
       const response = await axios.get(
@@ -130,6 +148,7 @@ const PodcastList = ({ navigate }) => {
       }
     } finally {
       setLoading(false)
+      toast.dismiss(loadingToastId) // Dismiss loading notification
     }
   }
 
@@ -201,11 +220,11 @@ const PodcastList = ({ navigate }) => {
   }, [])
 
   if (loading) {
-    return <div>Loading podcasts...</div>
+    return null // No need to render anything while loading, handled by toast
   }
 
   if (error) {
-    return <div>{error}</div>
+    return <div>{error}</div> // Show error message if there is an error
   }
 
   return (

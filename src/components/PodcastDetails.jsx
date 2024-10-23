@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-// Gain access to the context values
 import { useAudio } from '../contexts/AudioContext'
 import { FaPlay, FaDownload } from 'react-icons/fa'
 import { mockPodcastDetails } from '../mockApi/mockApi'
 import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const PodcastDetails = ({ navigate }) => {
   const { podcastId } = useParams()
@@ -26,6 +26,7 @@ const PodcastDetails = ({ navigate }) => {
   }
 
   const fetchPodcastDetails = async () => {
+    toast.info('Loading podcast details...', { autoClose: false }) // Show loading toast
     try {
       const response = await axios.get(
         `https://listen-api.listennotes.com/api/v2/podcasts/${podcastId}`,
@@ -37,14 +38,17 @@ const PodcastDetails = ({ navigate }) => {
       )
       setPodcast(response.data)
       setEpisodes(response.data.episodes)
+      toast.dismiss() // Dismiss loading toast
+      toast.success('Podcast details loaded successfully!') // Show success toast
     } catch (error) {
+      toast.dismiss() // Dismiss loading toast
       if (error.response) {
         if (error.response.status === 404) {
           setError('Podcast not found. Please check the ID or try another one.')
         } else if (error.response.status === 429) {
-          // Fallback to mock data if status is 429
           setPodcast(mockPodcastDetails)
           setEpisodes(mockPodcastDetails.episodes)
+          console.log('Rate limit exceeded, using mock data instead!') // Warn for mock data usage
         } else {
           setError('Error fetching podcast details: ' + error.message)
         }
@@ -93,7 +97,6 @@ const PodcastDetails = ({ navigate }) => {
     try {
       const audioUrl = episode.audio
 
-      // Alert to notify the user that the download has started
       alert(`Downloading episode "${episode.title}"...`)
 
       const response = await axios.get(audioUrl, { responseType: 'blob' })
@@ -107,9 +110,8 @@ const PodcastDetails = ({ navigate }) => {
       link.click()
       document.body.removeChild(link)
 
-      // Save download data to the backend
       await axios.post('http://localhost:4000/downloads/record', {
-        podcastId: episode.podcast.id, // Make sure this matches your podcast ID structure
+        podcastId: episode.podcast.id,
         podcastTitle: episode.title
       })
 
@@ -127,7 +129,7 @@ const PodcastDetails = ({ navigate }) => {
   }, [podcastId])
 
   if (loading) {
-    return <div>Loading podcast details...</div>
+    return null
   }
 
   if (error) {
