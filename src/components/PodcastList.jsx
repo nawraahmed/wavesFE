@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAudio } from '../contexts/AudioContext'
-import { FaPlay } from 'react-icons/fa'
+import { FaPlay, FaPlus } from 'react-icons/fa'
 import { fetchPodcastsMock } from '../mockApi/mockApi'
 import axios from 'axios'
 
@@ -147,9 +147,10 @@ const PodcastList = ({ navigate }) => {
     // Use the hardcoded audio URL to play the track
     playTrack({
       audio: hardcodedAudioUrl,
-      title: 'Hardcoded Episode Title',
+      title: ' Episode Title',
       thumbnail:
-        'https://cdn-images-3.listennotes.com/podcasts/sivan-says-taking-the-torah-personally-NsxhDfT1LKi-u5JpkIDUH34.300x300.jpg'
+        'https://cdn-images-3.listennotes.com/podcasts/sivan-says-taking-the-torah-personally-NsxhDfT1LKi-u5JpkIDUH34.300x300.jpg',
+      duration: '950'
     }) // Replace 'Hardcoded Episode Title' as needed
     navigate('/currently-playing') // Navigate to currently playing page
   }
@@ -168,7 +169,7 @@ const PodcastList = ({ navigate }) => {
 
   return (
     <div className="podcast-list-container">
-      <h1 className="podcast-list-title">Podcast List</h1>
+      {/* <h1 className="podcast-list-title">Podcast List</h1> */}
       <div className="podcast-grid">
         {podcasts.map((podcast, index) => (
           <div className="podcast-card" key={`${podcast.id}-${index}`}>
@@ -180,15 +181,18 @@ const PodcastList = ({ navigate }) => {
                 onClick={() => handlePodcastClick(podcast.podcast.id)}
               />
               <div className="podcast-buttons">
-                <button onClick={() => handleFavoritePodcast(podcast)}>
-                  ❤️ Like
+                <button
+                  className="like-button"
+                  onClick={() => handleFavoritePodcast(podcast)}
+                >
+                  ❤️
                 </button>
 
                 <button
                   className="add-button"
                   onClick={() => handleAddPodcast(podcast)}
                 >
-                  Add
+                  <FaPlus />
                 </button>
                 <button
                   className="play-button"
@@ -198,9 +202,7 @@ const PodcastList = ({ navigate }) => {
                 </button>
               </div>
             </div>
-            <div className="podcast-title">
-              {podcast.podcast.title_original}
-            </div>
+            <div className="podcast-name">{podcast.podcast.title_original}</div>
           </div>
         ))}
       </div>
