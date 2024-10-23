@@ -139,19 +139,60 @@ const PodcastList = ({ navigate }) => {
 
   const handlePlayClick = async (podcast) => {
     const podcastId = podcast.podcast.id // Get the podcast ID
+    console.log(podcastId)
+    const episodeId = '0e8f68f851394349afa9a7dbadfb35b7' // Get the episode ID
+    // Get the user object from local storage
+    const user = JSON.parse(localStorage.getItem('user')) // Parse the JSON string to an object
+
+    if (!user || !user.id) {
+      // Ensure user exists and has an id property
+      console.error('User ID not found in local storage.')
+      return // Handle the case when userId is not available
+    }
+
+    const userId = user.id // Extract the userId
+
+    // Now you can use podcastId, episodeId, and userId
+    console.log(
+      `Podcast ID: ${podcastId}, Episode ID: ${episodeId}, User ID: ${userId}`
+    )
 
     // Hardcoded audio URL for testing
     const hardcodedAudioUrl =
       'https://audio.listennotes.com/e/p/0e8f68f851394349afa9a7dbadfb35b7/' // Replace with your desired audio URL
 
+    // Create a new history record
+    const newHistory = {
+      userId,
+      podcastId,
+      episodeId,
+      podcastTitle: 'podcast.podcast.title', // Assuming you have this in your podcast object
+      episodeTitle: 'podcast.episode.title', // Assuming you have this in your episode object
+      progress: 0, // Initial progress
+      totalLength: 950 // You can get this from the episode details if available
+    }
+
+    try {
+      // Post the new history record to the backend
+      await axios.post('http://localhost:4000/history/track', newHistory, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      })
+    } catch (error) {
+      console.error('Error creating history record:', error.message)
+    }
+
     // Use the hardcoded audio URL to play the track
     playTrack({
+      podcastId: podcastId,
       audio: hardcodedAudioUrl,
       title: ' Episode Title',
       thumbnail:
         'https://cdn-images-3.listennotes.com/podcasts/sivan-says-taking-the-torah-personally-NsxhDfT1LKi-u5JpkIDUH34.300x300.jpg',
       duration: '950'
-    }) // Replace 'Hardcoded Episode Title' as needed
+    })
     navigate('/currently-playing') // Navigate to currently playing page
   }
 

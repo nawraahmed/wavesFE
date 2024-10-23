@@ -6,7 +6,7 @@ const Profile = () => {
     favorites: [],
     playlists: [],
     addedPodcasts: [],
-    episodes: []
+    history: []
   })
 
   useEffect(() => {
@@ -89,6 +89,19 @@ const Profile = () => {
                   <h3>{podcast.title}</h3>
                 </Link>
                 <p>{podcast.description}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section className="profile-section">
+        <h2 className="section-title">Watch History</h2>
+        <ul className="favorites-list">
+          {profile.history.map((episode, index) => (
+            <li className="favorite-item" key={index}>
+              <div className="podcast-info">
+                <h2>{episode.podcastTitle}</h2>
+                <h3>{episode.episodeTitle}</h3>
               </div>
             </li>
           ))}

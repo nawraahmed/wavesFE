@@ -7,7 +7,6 @@ import Login from './components/Login'
 import Register from './components/Register'
 import CurrentlyPlaying from './components/CurrentlyPlaying'
 import Profile from './components/Profile'
-import FavoritesList from './components/FavoritesList'
 import WatchHistory from './components/WatchHistory'
 import Footer from './components/Footer'
 import Home from './components/Home'
@@ -53,7 +52,6 @@ const App = () => {
           path="/currently-playing"
           element={<CurrentlyPlaying currentTrack={currentTrack} />}
         />
-        <Route path="/favorites" element={<FavoritesList />} />
         <Route path="/history" element={<WatchHistory />} />
         <Route
           path="/podcastList"
