@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-//gain access to the context values
+// Gain access to the context values
 import { useAudio } from '../contexts/AudioContext'
 import { FaPlay, FaDownload } from 'react-icons/fa'
 import { mockPodcastDetails } from '../mockApi/mockApi'
@@ -20,7 +20,6 @@ const PodcastDetails = () => {
     const minutes = Math.floor((seconds % 3600) / 60)
     const secs = seconds % 60
 
-    // Format the time string nicely
     return [hours > 0 ? `${hours}h` : null, `${minutes}m`, `${secs}s`]
       .filter(Boolean)
       .join(' ')
@@ -39,10 +38,16 @@ const PodcastDetails = () => {
       setPodcast(response.data)
       setEpisodes(response.data.episodes)
     } catch (error) {
-      if (error.response && error.response.status === 429) {
-        // Fallback to mock data if status is 429
-        setPodcast(mockPodcastDetails)
-        setEpisodes(mockPodcastDetails.episodes)
+      if (error.response) {
+        if (error.response.status === 404) {
+          setError('Podcast not found. Please check the ID or try another one.')
+        } else if (error.response.status === 429) {
+          // Fallback to mock data if status is 429
+          setPodcast(mockPodcastDetails)
+          setEpisodes(mockPodcastDetails.episodes)
+        } else {
+          setError('Error fetching podcast details: ' + error.message)
+        }
       } else {
         setError('Error fetching podcast details: ' + error.message)
       }
@@ -53,6 +58,34 @@ const PodcastDetails = () => {
 
   const handlePlayEpisode = (episode) => {
     playTrack(episode)
+  }
+
+  const downloadEpisode = async (audioUrl, title) => {
+    try {
+      alert(`Downloading episode "${title}"...`)
+
+      const response = await fetch(audioUrl)
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${title}.mp3`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error downloading episode:', error)
+      alert(
+        `Failed to download episode "${title}". Please check your network connection or try again later.`
+      )
+    }
   }
 
   const handleDownloadEpisode = async (episode) => {
@@ -73,17 +106,21 @@ const PodcastDetails = () => {
       link.click()
       document.body.removeChild(link)
 
+      // Save download data to the backend
+      await axios.post('http://localhost:4000/downloads/record', {
+        podcastId: episode.podcast.id, // Make sure this matches your podcast ID structure
+        podcastTitle: episode.title
+      })
+
       window.URL.revokeObjectURL(url)
     } catch (error) {
-      // Log the error for debugging purposes
       console.error('Error downloading episode:', error)
-
-      // Show an alert to the user on failure
       alert(
         `Failed to download episode "${episode.title}". Please check your network connection or try again later.`
       )
     }
   }
+
   useEffect(() => {
     fetchPodcastDetails()
   }, [podcastId])

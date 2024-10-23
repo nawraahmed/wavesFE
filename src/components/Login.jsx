@@ -63,7 +63,9 @@ const Login = ({ setUser }) => {
             />
           </div>
 
-          <button className="btn" type="submit">Login</button>
+          <button className="btn" type="submit">
+            Login
+          </button>
         </form>
 
         <p>
@@ -71,7 +73,7 @@ const Login = ({ setUser }) => {
         </p>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

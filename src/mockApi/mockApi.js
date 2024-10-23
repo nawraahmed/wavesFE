@@ -154,9 +154,47 @@ export const fetchTrendingPodcastsMock = () => {
             title_original: 'The Man in the Black Mask',
             thumbnail:
               'https://cdn-images-3.listennotes.com/podcasts/the-man-in-the-black-mask-nbc-news-vhOEgrapAU6-wfYp9NBa07_.300x300.jpg'
-          },
+          }
         ]
       })
     }, 1000) // Simulate network delay
+  })
+}
+
+// mockHistoryData.js
+
+// Example saveWatchHistory with simulated API call
+export const saveWatchHistory = async (podcastId, progress) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: podcastId,
+        title: `Podcast Episode ${podcastId}`,
+        progress,
+        timestamp: new Date().toISOString()
+      })
+    }, 1000)
+  })
+}
+
+// Fetch watch history
+export const fetchWatchHistory = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          title: 'Podcast Episode 1',
+          thumbnail: 'https://example.com/thumbnail1.jpg',
+          timestamp: '2024-10-22T12:00:00Z',
+          progress: 120 // seconds
+        },
+        {
+          title: 'Podcast Episode 2',
+          thumbnail: 'https://example.com/thumbnail2.jpg',
+          timestamp: '2024-10-21T15:00:00Z',
+          progress: 300 // seconds
+        }
+      ])
+    }, 1000)
   })
 }

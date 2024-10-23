@@ -1,13 +1,40 @@
 import { useEffect } from 'react'
 import { useAudio } from '../contexts/AudioContext'
+import { saveWatchHistory } from '../mockApi/mockApi' // Adjust import as necessary
 
 const CurrentlyPlaying = () => {
   const { currentTrack, isPlaying, playTrack, pauseTrack, currentTime } =
     useAudio()
 
+  // Save progress when the user plays/pauses or navigates away
+  useEffect(() => {
+    if (currentTrack) {
+      const saveProgress = async () => {
+        try {
+          await saveWatchHistory(currentTrack.id, currentTime) // Save podcast and progress
+        } catch (error) {
+          console.error('Error saving history:', error)
+        }
+      }
+
+      // Save progress when pausing
+      if (!isPlaying) {
+        saveProgress()
+      }
+
+      // Optionally, save progress every 60 seconds if the user is still listening
+      const intervalId = setInterval(() => {
+        saveProgress()
+      }, 60000)
+
+      // Clear interval when component is unmounted or track changes
+      return () => clearInterval(intervalId)
+    }
+  }, [currentTrack, currentTime, isPlaying])
+
   return (
     <div className="currently-playing">
-      <h3 className="cp-heading">Now Playing</h3>
+      <h3>Now Playing</h3>
       {currentTrack ? (
         <div className="track-info">
           <div className="track-image">
@@ -23,7 +50,9 @@ const CurrentlyPlaying = () => {
             <div className="player-controls">
               <button
                 className="control-button"
-                onClick={() => playTrack(currentTrack)}
+                onClick={() =>
+                  isPlaying ? pauseTrack() : playTrack(currentTrack)
+                }
               >
                 {isPlaying ? 'Pause' : 'Play'}
               </button>
