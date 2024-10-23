@@ -20,12 +20,7 @@ const Header = ({ user, handleLogout }) => {
         <NavLink to="/profile" className="nav-link">
           Profile
         </NavLink>
-        <NavLink to="/login" className="nav-link">
-          Login
-        </NavLink>
-        <NavLink to="/register" className="nav-link">
-          Register
-        </NavLink>
+
         {/* Conditionally render either Sign In or Logout */}
         {user ? (
           <button onClick={handleLogout} className="sign-in-btn">
