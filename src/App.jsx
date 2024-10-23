@@ -13,7 +13,7 @@ import Footer from './components/Footer'
 import Home from './components/Home'
 import PodcastList from './components/PodcastList'
 import PodcastDetails from './components/PodcastDetails'
-// import Dashboard from './components/Dashboard'
+import Dashboard from './components/Dashboard'
 
 //destructuring the currentTrack from useAudio()
 import { useAudio } from './contexts/AudioContext'
@@ -44,6 +44,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/discover" element={<Discover />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
