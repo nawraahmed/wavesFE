@@ -112,15 +112,18 @@ const Discover = () => {
     )
   }
 
+  // Handle slide to the left
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => Math.max(prevIndex - itemsPerSlide, 0))
   }
 
+  // Handle touch start event
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches ? e.touches[0].clientX : e.clientX
     isDragging.current = true
   }
 
+  // Handle touch move event
   const handleTouchMove = (e) => {
     if (!isDragging.current) return
     const touchEndX = e.touches ? e.touches[0].clientX : e.clientX
@@ -135,8 +138,22 @@ const Discover = () => {
     }
   }
 
+  // Handle touch end event
   const handleTouchEnd = () => {
     isDragging.current = false
+  }
+
+  // Handle click events for the buttons (dummy handlers for now)
+  const handleFavoritePodcast = (podcast) => {
+    console.log('Favorite podcast:', podcast)
+  }
+
+  const handleAddPodcast = (podcast) => {
+    console.log('Add podcast:', podcast)
+  }
+
+  const handlePlayClick = (podcast) => {
+    console.log('Play podcast:', podcast)
   }
 
   return (
@@ -162,16 +179,37 @@ const Discover = () => {
             justifyContent: 'center'
           }}
         >
-          {podcasts.map((podcast) => (
-            <div className="podcast-card" key={podcast.id}>
-              <img
-                src={podcast.thumbnail}
-                alt={podcast.title_original}
-                className="podcast-thumbnail"
-              />
-              <div className="podcast-info">
-                <h3 className="podcast-title-ss">{podcast.title_original}</h3>
+          {podcasts.map((podcast, index) => (
+            <div className="podcast-card" key={`${podcast.id}-${index}`}>
+              <div className="podcast-image-container">
+                <img
+                  src={podcast.thumbnail}
+                  alt={`${podcast.title_original} thumbnail`}
+                  className="podcast-thumbnail"
+                  onClick={() => handlePlayClick(podcast)}
+                />
+                <div className="podcast-buttons">
+                  <button
+                    className="like-button"
+                    onClick={() => handleFavoritePodcast(podcast)}
+                  >
+                    ❤️
+                  </button>
+                  <button
+                    className="add-button"
+                    onClick={() => handleAddPodcast(podcast)}
+                  >
+                    <FaPlus />
+                  </button>
+                  <button
+                    className="play-button"
+                    onClick={() => handlePlayClick(podcast)}
+                  >
+                    <FaPlay />
+                  </button>
+                </div>
               </div>
+              <div className="podcast-name">{podcast.title_original}</div>
             </div>
           ))}
         </div>
@@ -184,7 +222,6 @@ const Discover = () => {
             &#60; {/* Left arrow */}
           </button>
         )}
-
         {currentIndex + itemsPerSlide < podcasts.length && (
           <button className="swap-button" onClick={nextSlide}>
             &#62; {/* Right arrow */}

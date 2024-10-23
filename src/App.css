@@ -698,7 +698,6 @@ h4 {
 .podcast-card {
   min-width: calc(25% - 5px);
   margin: 5px;
-  background-color: rgba(0, 0, 0, 0.75);
   border-radius: 8px;
   padding: 0px;
   text-align: center;
@@ -714,7 +713,7 @@ h4 {
   color: white;
   border: none;
   padding: 10px 15px;
-  border-radius: 8px;
+  border-radius: 80px;
   cursor: pointer;
   margin: 0 10px;
   transition: background-color 0.3s, transform 0.2s;
