@@ -1,8 +1,47 @@
-# React + Vite
+# **Waves Podcast App**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Date: 24/10/2024
 
-Currently, two official plugins are available:
+### By: Noor Aljirdabi | Nawraa Ahmed | Ali A.Alkarim
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
+
+### **Description**
+
+Waves is a full-stack podcast application built to explore and listen to a variety of podcasts. Users can search for new podcasts, save their favorite podcasts, and track their listening history, including where they left off in episodes. The app provides a dashboard with visual charts to display completed and not completed episodes. Waves was built using the MERN stack as part of a project for the General Assembly bootcamp.
+
+---
+
+### **Technologies Used**
+
+- **MongoDB**
+- **Express**
+- **React**
+- **Node.js**
+- **JWT for authentication**
+- **Chart.js**
+
+---
+
+##### You can view the Trello board tracking the development progress [here](https://trello.com/b/zglS1zxt/my-trello-board).
+
+##### The project was deployed and can be accessed [here](URL).
+
+---
+
+### **Screenshots**
+
+---
+
+### **Future Updates**
+
+- [ ] Add the ability to create personalized playlists
+- [ ] Integrate more podcast platforms for content diversity
+
+---
+
+### **Credits**
+
+- **Podcast API**: Listennotes API for providing podcast data
+
+---
