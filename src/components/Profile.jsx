@@ -94,6 +94,33 @@ const Profile = () => {
           ))}
         </ul>
       </section>
+      
+      <section className="profile-section">
+  <h2 className="section-title">Playlists</h2>
+  <ul className="favorites-list">
+    {profile.playlists.map((playlist, index) => (
+      <li className="favorite-item" key={index}>
+        {/* Make playlist clickable */}
+        <Link to={`/playlist/${playlist._id}`}>
+          <div className="podcast-thumbnail-container">
+            <img
+              src={playlist.thumbnail}
+              alt={`${playlist.name} thumbnail`}
+              className="podcast-thumbnail"
+            />
+          </div>
+        </Link>
+        <div className="podcast-info">
+          {/* Make title clickable */}
+          <Link to={`/playlist/${playlist._id}`}>
+            <h3>{playlist.name}</h3>
+          </Link>
+          <p>{playlist.description}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
     </div>
   )
 }
