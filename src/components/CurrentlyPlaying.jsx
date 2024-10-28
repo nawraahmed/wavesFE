@@ -1,50 +1,49 @@
 import { useEffect, useState } from 'react'
 import { useAudio } from '../contexts/AudioContext'
-import { saveWatchHistory } from '../mockApi/mockApi' // Adjust import as necessary
+import axios from 'axios' // Import axios for API calls
 
 const CurrentlyPlaying = () => {
   const { currentTrack, isPlaying, playTrack, pauseTrack, currentTime } =
     useAudio()
   const [progress, setProgress] = useState(0)
+  const user = JSON.parse(localStorage.getItem('user')) // Get the user ID from local storage
+  const userId = user.id
+  const episodeId = '0e8f68f851394349afa9a7dbadfb35b7' // Get the episode ID from the currentTrack (you might need to pass this down)
 
   useEffect(() => {
     if (currentTrack) {
-      const trackDuration = currentTrack.duration || 950 // Fallback to 15 minutes if no duration
+      const trackDuration = currentTrack.duration || 1500 // Fallback to 15 minutes if no duration
       setProgress((currentTime / trackDuration) * 100)
+      updateProgress() // Call update progress function
     }
   }, [currentTime, currentTrack])
+
+  const updateProgress = async () => {
+    const progressData = {
+      userId,
+      podcastId: 'cc01c37cc6b54nkjk5ebw5d3756fcae4cc9f0',
+      episodeId,
+      progress: currentTime,
+      totalLength: currentTrack.duration || 1500 // Fallback to 15 minutes if no duration
+    }
+
+    try {
+      // Put the update progress to the backend with auth token
+      await axios.post('http://localhost:4000/history/track', progressData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      })
+    } catch (error) {
+      console.error('Error updating history record:', error.message)
+    }
+  }
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60)
     const seconds = ('0' + Math.floor(timeInSeconds % 60)).slice(-2)
     return `${minutes}:${seconds}`
   }
-
-  // Save progress when the user plays/pauses or navigates away
-  useEffect(() => {
-    if (currentTrack) {
-      const saveProgress = async () => {
-        try {
-          await saveWatchHistory(currentTrack.id, currentTime) // Save podcast and progress
-        } catch (error) {
-          console.error('Error saving history:', error)
-        }
-      }
-
-      // Save progress when pausing
-      if (!isPlaying) {
-        saveProgress()
-      }
-
-      // Optionally, save progress every 60 seconds if the user is still listening
-      const intervalId = setInterval(() => {
-        saveProgress()
-      }, 60000)
-
-      // Clear interval when component is unmounted or track changes
-      return () => clearInterval(intervalId)
-    }
-  }, [currentTrack, currentTime, isPlaying])
 
   return (
     <div className="currently-playing">

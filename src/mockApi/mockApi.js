@@ -21,6 +21,18 @@ export const mockPodcastData = {
         description_original: 'This is a mock description for the podcast.', // Add this mock description
         genre_ids: ['mock-genre-id'] // Provide a mock genre ID
       }
+    },
+    {
+      podcast: {
+        // Wrap the second podcast data as well
+        id: 'c5c512d4b48a42f0acef83dd9615267c',
+        title_original: 'Sivan Says: Taking the Torah Personally',
+        thumbnail:
+          'https://cdn-images-3.listennotes.com/podcasts/sivan-says-taking-the-torah-personally-NsxhDfT1LKi-u5JpkIDUH34.300x300.jpg',
+        description_original:
+          'Each week, journalist and Torah scholar Sivan Rahav-Meir and Tablet’s own Liel Leibovitz discuss the week’s parsha, giving practical advice from our holiest book.', // Add this mock description
+        genre_ids: ['mock-genre-id'] // Provide a mock genre ID
+      }
     }
   ]
 }
@@ -95,7 +107,6 @@ export const fetchTrendingPodcastsMock = () => {
     setTimeout(() => {
       resolve({
         podcasts: [
-      
           {
             id: 'a7208a3e2a654f999cf78c731824660a',
             title_original: 'My So-Called Midlife with Reshma Saujani',
@@ -155,7 +166,7 @@ export const fetchTrendingPodcastsMock = () => {
             title_original: 'The Man in the Black Mask',
             thumbnail:
               'https://cdn-images-3.listennotes.com/podcasts/the-man-in-the-black-mask-nbc-news-vhOEgrapAU6-wfYp9NBa07_.300x300.jpg'
-          },          
+          }
         ]
       })
     }, 1000) // Simulate network delay

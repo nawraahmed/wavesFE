@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-// Gain access to the context values
 import { useAudio } from '../contexts/AudioContext'
 import { FaPlay, FaDownload } from 'react-icons/fa'
 import { mockPodcastDetails } from '../mockApi/mockApi'
 import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const PodcastDetails = ({ navigate }) => {
   const { podcastId } = useParams()
@@ -12,6 +12,7 @@ const PodcastDetails = ({ navigate }) => {
   const [podcast, setPodcast] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showMore, setShowMore] = useState(false)
   const apiKey = import.meta.env.VITE_API_KEY
   const { playTrack } = useAudio()
 
@@ -26,6 +27,7 @@ const PodcastDetails = ({ navigate }) => {
   }
 
   const fetchPodcastDetails = async () => {
+    toast.info('Loading podcast details...', { autoClose: false }) // Show loading toast
     try {
       const response = await axios.get(
         `https://listen-api.listennotes.com/api/v2/podcasts/${podcastId}`,
@@ -35,16 +37,22 @@ const PodcastDetails = ({ navigate }) => {
           }
         }
       )
+
       setPodcast(response.data)
+
       setEpisodes(response.data.episodes)
+
+      toast.dismiss() // Dismiss loading toast
+      toast.success('Podcast details loaded successfully!') // Show success toast
     } catch (error) {
+      toast.dismiss() // Dismiss loading toast
       if (error.response) {
         if (error.response.status === 404) {
           setError('Podcast not found. Please check the ID or try another one.')
         } else if (error.response.status === 429) {
-          // Fallback to mock data if status is 429
           setPodcast(mockPodcastDetails)
           setEpisodes(mockPodcastDetails.episodes)
+          console.log('Rate limit exceeded, using mock data instead!') // Warn for mock data usage
         } else {
           setError('Error fetching podcast details: ' + error.message)
         }
@@ -56,69 +64,86 @@ const PodcastDetails = ({ navigate }) => {
     }
   }
 
-  const handlePlayEpisode = (episode) => {
+  const handlePlayEpisode = async (episode) => {
+    const episodeId = episode.id
+    const user = JSON.parse(localStorage.getItem('user'))
+
+    if (!user || !user.id) {
+      // Ensure user exists and has an id property
+      console.error('User ID not found in local storage.')
+      return
+    }
+    // Extract the userId
+    const userId = user.id
+
+    // Now you can use podcastId, episodeId, and userId
+    console.log(
+      `Podcast ID: ${podcastId}, Episode ID: ${episodeId}, User ID: ${userId}, show title: ${podcast.title}`
+    )
+
+    // Create a new history record
+    const newHistory = {
+      userId,
+      podcastId,
+      episodeId,
+      podcastTitle: podcast.title,
+      episodeTitle: episode.title,
+      progress: 0, // Initial progress
+      totalLength: episode.audio_length_sec
+    }
+
+    console.log(newHistory)
+    try {
+      // Post the new history record to the backend
+      await axios.post('http://localhost:4000/history/track', newHistory, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      })
+    } catch (error) {
+      console.error('Error creating history record:', error.message)
+    }
+
     playTrack(episode)
     navigate('/currently-playing')
   }
 
-  const downloadEpisode = async (audioUrl, title) => {
-    try {
-      alert(`Downloading episode "${title}"...`)
-
-      const response = await fetch(audioUrl)
-      if (!response.ok) {
-        throw new Error('Network response was not ok')
-      }
-
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `${title}.mp3`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-
-      window.URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('Error downloading episode:', error)
-      alert(
-        `Failed to download episode "${title}". Please check your network connection or try again later.`
-      )
-    }
-  }
-
   const handleDownloadEpisode = async (episode) => {
+    const audioUrl = episode.audio
+    const episodeTitle = episode.title
+
+    toast.info(`Starting download for "${episodeTitle}"...`)
+
     try {
-      const audioUrl = episode.audio
-
-      // Alert to notify the user that the download has started
-      alert(`Downloading episode "${episode.title}"...`)
-
+      // First, handle the file download part
       const response = await axios.get(audioUrl, { responseType: 'blob' })
       const blob = new Blob([response.data], { type: 'audio/mpeg' })
       const url = window.URL.createObjectURL(blob)
 
       const link = document.createElement('a')
       link.href = url
-      link.download = `${episode.title}.mp3`
+      link.download = `${episodeTitle}.mp3`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
 
-      // Save download data to the backend
-      await axios.post('http://localhost:4000/downloads/record', {
-        podcastId: episode.podcast.id, // Make sure this matches your podcast ID structure
-        podcastTitle: episode.title
-      })
-
       window.URL.revokeObjectURL(url)
+      toast.success(`Successfully downloaded "${episodeTitle}"!`)
     } catch (error) {
       console.error('Error downloading episode:', error)
-      alert(
-        `Failed to download episode "${episode.title}". Please check your network connection or try again later.`
-      )
+      toast.error(`Failed to download "${episodeTitle}". Please try again.`)
+      return // Exit the function if the download fails
+    }
+
+    // Second, handle the server call to record the download
+    try {
+      await axios.post('http://localhost:4000/downloads/record', {
+        podcastId: episode.podcast.id,
+        podcastTitle: episodeTitle
+      })
+    } catch (error) {
+      console.error('Error recording download to the server:', error)
     }
   }
 
@@ -127,11 +152,35 @@ const PodcastDetails = ({ navigate }) => {
   }, [podcastId])
 
   if (loading) {
-    return <div>Loading podcast details...</div>
+    return null
   }
 
   if (error) {
     return <div>{error}</div>
+  }
+
+  const renderDescription = () => {
+    if (!podcast.description) return null
+    if (podcast.description.length > 400) {
+      return (
+        <div>
+          <div>
+            {showMore
+              ? podcast.description
+              : podcast.description.slice(0, 400) + '...'}
+          </div>
+          <div>
+            <button
+              onClick={() => setShowMore(!showMore)}
+              className="show-more-btn"
+            >
+              {showMore ? 'Show less' : 'Show more'}
+            </button>
+          </div>
+        </div>
+      )
+    }
+    return <p className="podcast-description">{podcast.description}</p>
   }
 
   return (
@@ -147,7 +196,7 @@ const PodcastDetails = ({ navigate }) => {
           <p className="podcast-publisher">Publisher: {podcast.publisher}</p>
           <p className="podcast-country">Country: {podcast.country}</p>
           <p className="podcast-language">Language: {podcast.language}</p>
-          <p className="podcast-description">{podcast.description}</p>
+          {renderDescription()} {/* Use the renderDescription function */}
         </div>
       )}
       <div className="episode-list">

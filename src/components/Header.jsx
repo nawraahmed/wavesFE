@@ -3,7 +3,7 @@ import { NavLink, Link } from 'react-router-dom'
 const Header = ({ user, handleLogout }) => {
   return (
     <header className="header">
-      <h1 className="app-title">Podcast App</h1>
+      <img src="/logo.png" alt="Podcast App Logo" className="app-logo" />
       <nav className="nav-links">
         <NavLink to="/" className="nav-link">
           Home
@@ -11,21 +11,19 @@ const Header = ({ user, handleLogout }) => {
         <NavLink to="/discover" className="nav-link">
           Discover
         </NavLink>
-        <NavLink to="/dashboard" className="nav-link">
-          Dashboard
-        </NavLink>
         <NavLink to="/podcastList" className="nav-link">
-          Podcast List
-        </NavLink>
-        <NavLink to="/history" className="active-link">
-          Watch History
+          Podcast Library
         </NavLink>
         <NavLink to="/currently-playing" className="nav-link">
           Currently Playing
         </NavLink>
-        <NavLink to="/profile" className="nav-link">
-          Profile
-        </NavLink>
+
+        {/* Conditionally render Profile link */}
+        {user && (
+          <NavLink to="/profile" className="nav-link">
+            Profile
+          </NavLink>
+        )}
 
         {/* Conditionally render either Sign In or Logout */}
         {user ? (

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAudio } from '../contexts/AudioContext'
 import { FaPlay, FaPlus } from 'react-icons/fa'
 import { fetchPodcastsMock } from '../mockApi/mockApi'
+import { toast } from 'react-toastify'
 import axios from 'axios'
 
 const PodcastList = ({ navigate }) => {
@@ -9,10 +10,9 @@ const PodcastList = ({ navigate }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const apiKey = import.meta.env.VITE_API_KEY
-  const { playTrack } = useAudio()
 
   const handleAddPodcast = async (podcast) => {
-    console.log('Attempting to add podcast:', podcast.podcast.id) // Log the ID of the podcast being added
+    console.log('Attempting to add podcast:', podcast.podcast.id)
     try {
       const mappedPodcast = {
         externalId: podcast.podcast.id,
@@ -38,7 +38,7 @@ const PodcastList = ({ navigate }) => {
         }
       )
 
-      console.log('Podcast added successfully:', res.data) // Log the response data after a successful addition
+      console.log('Podcast added successfully:', res.data)
     } catch (error) {
       // Log the error details if the addition fails
       if (error.response) {
@@ -48,6 +48,13 @@ const PodcastList = ({ navigate }) => {
         )
         console.error('Error status code:', error.response.status)
         console.error('Error headers:', error.response.headers)
+
+        // Check for a 409 status code
+        if (error.response.status === 409) {
+          toast.error('This podcast is already in your list!', {
+            autoClose: 3000 // Auto-close after 3 seconds
+          })
+        }
       } else {
         console.error('Error adding podcast:', error.message)
       }
@@ -91,6 +98,13 @@ const PodcastList = ({ navigate }) => {
         )
         console.error('Error status code:', error.response.status)
         console.error('Error headers:', error.response.headers)
+
+        // Check for a 409 status code
+        if (error.response.status === 409) {
+          toast.error('This podcast is already in your favorites!', {
+            autoClose: 3000 // Auto-close after 3 seconds
+          })
+        }
       } else {
         console.error('Error adding podcast:', error.message)
       }
@@ -98,26 +112,46 @@ const PodcastList = ({ navigate }) => {
   }
 
   const fetchPodcasts = async () => {
-    const searchTerm = 're'
+    const searchTerm = 'he'
+    let offset = 0 // Initialize the offset to zero for the first batch
+    const allPodcasts = [] // To store all podcasts across multiple requests
     setLoading(true)
     setError(null)
 
-    try {
-      const response = await axios.get(
-        `https://listen-api.listennotes.com/api/v2/search?q=${searchTerm}`,
-        {
-          headers: {
-            'X-ListenAPI-Key': apiKey
-          }
-        }
-      )
+    // Show loading toast notification
+    const loadingToastId = toast.loading('Loading podcasts...') // Start loading notification
 
-      const data = response.data
-      if (data.results.length === 0) {
+    try {
+      while (true) {
+        // Call the API with the current offset
+        const response = await axios.get(
+          `https://listen-api.listennotes.com/api/v2/search?q=${searchTerm}&offset=${offset}`,
+          {
+            headers: {
+              'X-ListenAPI-Key': apiKey
+            }
+          }
+        )
+
+        const data = response.data
+
+        // If there are no more podcasts to fetch, break the loop
+        if (data.results.length === 0) {
+          break
+        }
+
+        // Add the fetched batch of podcasts to the array
+        allPodcasts.push(...data.results)
+
+        // Update the offset for the next batch, if provided
+        offset = data.next_offset || offset + data.results.length
+      }
+
+      // Check if podcasts were found, otherwise display an error message
+      if (allPodcasts.length === 0) {
         setError('No podcasts found for your search.')
-        setPodcasts([])
       } else {
-        setPodcasts(data.results)
+        setPodcasts(allPodcasts)
       }
     } catch (error) {
       if (error.response && error.response.status === 429) {
@@ -126,33 +160,17 @@ const PodcastList = ({ navigate }) => {
         setPodcasts(mockData)
       } else {
         setError('Error fetching podcasts: ' + error.message)
-        setPodcasts([])
       }
     } finally {
       setLoading(false)
+      toast.dismiss(loadingToastId) // Dismiss loading notification
     }
   }
 
   const handlePodcastClick = (podcastId) => {
-    navigate(`/podcast/c5c512d4b48a42f0acef83dd9615267c`) // Navigate to Podcast Details page with podcast ID
-  }
-
-  const handlePlayClick = async (podcast) => {
-    const podcastId = podcast.podcast.id // Get the podcast ID
-
-    // Hardcoded audio URL for testing
-    const hardcodedAudioUrl =
-      'https://audio.listennotes.com/e/p/0e8f68f851394349afa9a7dbadfb35b7/' // Replace with your desired audio URL
-
-    // Use the hardcoded audio URL to play the track
-    playTrack({
-      audio: hardcodedAudioUrl,
-      title: ' Episode Title',
-      thumbnail:
-        'https://cdn-images-3.listennotes.com/podcasts/sivan-says-taking-the-torah-personally-NsxhDfT1LKi-u5JpkIDUH34.300x300.jpg',
-      duration: '950'
-    }) // Replace 'Hardcoded Episode Title' as needed
-    navigate('/currently-playing') // Navigate to currently playing page
+    const defaultPodcastId = 'c5c512d4b48a42f0acef83dd9615267c' // Default static value
+    const idToUse = podcastId || defaultPodcastId // Use the provided podcastId, or fallback to default
+    navigate(`/podcast/${idToUse}`) // Navigate to the Podcast Details page with the correct podcast ID
   }
 
   useEffect(() => {
@@ -160,11 +178,11 @@ const PodcastList = ({ navigate }) => {
   }, [])
 
   if (loading) {
-    return <div>Loading podcasts...</div>
+    return null // No need to render anything while loading, handled by toast
   }
 
   if (error) {
-    return <div>{error}</div>
+    return <div>{error}</div> // Show error message if there is an error
   }
 
   return (
@@ -193,12 +211,6 @@ const PodcastList = ({ navigate }) => {
                   onClick={() => handleAddPodcast(podcast)}
                 >
                   <FaPlus />
-                </button>
-                <button
-                  className="play-button"
-                  onClick={() => handlePlayClick(podcast)}
-                >
-                  <FaPlay /> {/* Play icon */}
                 </button>
               </div>
             </div>
