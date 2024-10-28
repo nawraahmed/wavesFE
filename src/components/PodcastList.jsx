@@ -10,7 +10,6 @@ const PodcastList = ({ navigate }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const apiKey = import.meta.env.VITE_API_KEY
-  const { playTrack } = useAudio()
 
   const handleAddPodcast = async (podcast) => {
     console.log('Attempting to add podcast:', podcast.podcast.id)
@@ -113,7 +112,9 @@ const PodcastList = ({ navigate }) => {
   }
 
   const fetchPodcasts = async () => {
-    const searchTerm = 're'
+    const searchTerm = 'he'
+    let offset = 0 // Initialize the offset to zero for the first batch
+    const allPodcasts = [] // To store all podcasts across multiple requests
     setLoading(true)
     setError(null)
 
@@ -121,21 +122,36 @@ const PodcastList = ({ navigate }) => {
     const loadingToastId = toast.loading('Loading podcasts...') // Start loading notification
 
     try {
-      const response = await axios.get(
-        `https://listen-api.listennotes.com/api/v2/search?q=${searchTerm}`,
-        {
-          headers: {
-            'X-ListenAPI-Key': apiKey
+      while (true) {
+        // Call the API with the current offset
+        const response = await axios.get(
+          `https://listen-api.listennotes.com/api/v2/search?q=${searchTerm}&offset=${offset}`,
+          {
+            headers: {
+              'X-ListenAPI-Key': apiKey
+            }
           }
-        }
-      )
+        )
 
-      const data = response.data
-      if (data.results.length === 0) {
+        const data = response.data
+
+        // If there are no more podcasts to fetch, break the loop
+        if (data.results.length === 0) {
+          break
+        }
+
+        // Add the fetched batch of podcasts to the array
+        allPodcasts.push(...data.results)
+
+        // Update the offset for the next batch, if provided
+        offset = data.next_offset || offset + data.results.length
+      }
+
+      // Check if podcasts were found, otherwise display an error message
+      if (allPodcasts.length === 0) {
         setError('No podcasts found for your search.')
-        setPodcasts([])
       } else {
-        setPodcasts(data.results)
+        setPodcasts(allPodcasts)
       }
     } catch (error) {
       if (error.response && error.response.status === 429) {
@@ -144,7 +160,6 @@ const PodcastList = ({ navigate }) => {
         setPodcasts(mockData)
       } else {
         setError('Error fetching podcasts: ' + error.message)
-        setPodcasts([])
       }
     } finally {
       setLoading(false)
@@ -153,66 +168,9 @@ const PodcastList = ({ navigate }) => {
   }
 
   const handlePodcastClick = (podcastId) => {
-    navigate(`/podcast/c5c512d4b48a42f0acef83dd9615267c`) // Navigate to Podcast Details page with podcast ID
-  }
-
-  const handlePlayClick = async (podcast) => {
-    const podcastId = podcast.podcast.id // Get the podcast ID
-    console.log(podcastId)
-    const episodeId = '0e8f68f851394349afa9a7dbadfb35b7' // Get the episode ID
-    // Get the user object from local storage
-    const user = JSON.parse(localStorage.getItem('user')) // Parse the JSON string to an object
-
-    if (!user || !user.id) {
-      // Ensure user exists and has an id property
-      console.error('User ID not found in local storage.')
-      return // Handle the case when userId is not available
-    }
-
-    const userId = user.id // Extract the userId
-
-    // Now you can use podcastId, episodeId, and userId
-    console.log(
-      `Podcast ID: ${podcastId}, Episode ID: ${episodeId}, User ID: ${userId}`
-    )
-
-    // Hardcoded audio URL for testing
-    const hardcodedAudioUrl =
-      'https://audio.listennotes.com/e/p/0e8f68f851394349afa9a7dbadfb35b7/' // Replace with your desired audio URL
-
-    // Create a new history record
-    const newHistory = {
-      userId,
-      podcastId,
-      episodeId,
-      podcastTitle: 'podcast.podcast.title', // Assuming you have this in your podcast object
-      episodeTitle: 'podcast.episode.title', // Assuming you have this in your episode object
-      progress: 0, // Initial progress
-      totalLength: 950 // You can get this from the episode details if available
-    }
-
-    try {
-      // Post the new history record to the backend
-      await axios.post('http://localhost:4000/history/track', newHistory, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
-        }
-      })
-    } catch (error) {
-      console.error('Error creating history record:', error.message)
-    }
-
-    // Use the hardcoded audio URL to play the track
-    playTrack({
-      podcastId: podcastId,
-      audio: hardcodedAudioUrl,
-      title: ' Episode Title',
-      thumbnail:
-        'https://cdn-images-3.listennotes.com/podcasts/sivan-says-taking-the-torah-personally-NsxhDfT1LKi-u5JpkIDUH34.300x300.jpg',
-      duration: '950'
-    })
-    navigate('/currently-playing') // Navigate to currently playing page
+    const defaultPodcastId = 'c5c512d4b48a42f0acef83dd9615267c' // Default static value
+    const idToUse = podcastId || defaultPodcastId // Use the provided podcastId, or fallback to default
+    navigate(`/podcast/${idToUse}`) // Navigate to the Podcast Details page with the correct podcast ID
   }
 
   useEffect(() => {
@@ -253,12 +211,6 @@ const PodcastList = ({ navigate }) => {
                   onClick={() => handleAddPodcast(podcast)}
                 >
                   <FaPlus />
-                </button>
-                <button
-                  className="play-button"
-                  onClick={() => handlePlayClick(podcast)}
-                >
-                  <FaPlay /> {/* Play icon */}
                 </button>
               </div>
             </div>

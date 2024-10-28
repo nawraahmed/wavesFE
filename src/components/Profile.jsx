@@ -8,6 +8,7 @@ import {
   BarElement,
   Title
 } from 'chart.js'
+import { FaArrowCircleUp } from 'react-icons/fa' // Import the arrow icon
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title)
 
@@ -18,6 +19,7 @@ const Profile = () => {
     addedPodcasts: [],
     history: []
   })
+  const [showScrollTop, setShowScrollTop] = useState(false)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -74,14 +76,53 @@ const Profile = () => {
     }
   }
 
+  // Function to show or hide scroll-to-top button
+  const handleScroll = () => {
+    if (window.scrollY > 300) {
+      setShowScrollTop(true)
+    } else {
+      setShowScrollTop(false)
+    }
+  }
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
   return (
     <div className="profile-container">
       <div className="profile-header">
         <h1 className="profile-username">{profile.username}</h1>
       </div>
 
-      <section className="profile-section">
-        <h2 className="section-title">Favorite Podcasts</h2>
+      <nav className="profile-nav">
+        <h4 className="nav-title">Navigation</h4>
+        <ul>
+          <li>
+            <a href="#favorites">Favorite Podcasts ❤️</a>
+          </li>
+          <li>
+            <a href="#added">Added Podcasts ✅</a>
+          </li>
+          <li>
+            <a href="#history">Watch History 🕗</a>
+          </li>
+          <li>
+            <a href="#dashboard">Dashboard 📊</a>
+          </li>
+        </ul>
+      </nav>
+
+      <section id="favorites" className="profile-section">
+        <h2 className="section-title">Favorite Podcasts ❤️</h2>
         <ul className="favorites-list">
           {profile.favorites.map((favorite, index) => (
             <li className="favorite-item" key={index}>
@@ -98,15 +139,14 @@ const Profile = () => {
                 <Link to={`/podcast/${favorite.externalId}`}>
                   <h3>{favorite.title}</h3>
                 </Link>
-                <p>{favorite.description}</p>
               </div>
             </li>
           ))}
         </ul>
       </section>
 
-      <section className="profile-section">
-        <h2 className="section-title">Added Podcasts</h2>
+      <section id="added" className="profile-section">
+        <h2 className="section-title">Added Podcasts ✅</h2>
         <ul className="favorites-list">
           {profile.addedPodcasts.map((podcast, index) => (
             <li className="favorite-item" key={index}>
@@ -130,14 +170,14 @@ const Profile = () => {
         </ul>
       </section>
 
-      <section className="profile-section">
-        <h2 className="section-title">Watch History</h2>
+      <section id="history" className="profile-section">
+        <h2 className="section-title">Watch History 🕗 </h2>
         <ul className="favorites-list">
           {profile.history.map((episode, index) => (
             <li className="favorite-item" key={index}>
               <div className="podcast-info">
-                <h2>{episode.podcastTitle}</h2>
-                <h3>{episode.episodeTitle}</h3>
+                <h3>{episode.podcastTitle}</h3>
+                <h4>{episode.episodeTitle}</h4>
               </div>
             </li>
           ))}
@@ -145,8 +185,8 @@ const Profile = () => {
       </section>
 
       {/* Dashboard Section with Chart */}
-      <section className="profile-section">
-        <h2 className="section-title">Dashboard</h2>
+      <section id="dashboard" className="profile-section">
+        <h2 className="section-title">Dashboard 📊</h2>
         <div className="dashboard-info">
           <Bar
             data={getChartData()}
@@ -162,6 +202,13 @@ const Profile = () => {
           />
         </div>
       </section>
+
+      {/* Scroll-to-top button */}
+      {showScrollTop && (
+        <button className="scroll-to-top" onClick={scrollToTop}>
+          <FaArrowCircleUp size={30} />
+        </button>
+      )}
     </div>
   )
 }

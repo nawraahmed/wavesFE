@@ -12,7 +12,7 @@ const CurrentlyPlaying = () => {
 
   useEffect(() => {
     if (currentTrack) {
-      const trackDuration = currentTrack.duration || 950 // Fallback to 15 minutes if no duration
+      const trackDuration = currentTrack.duration || 1500 // Fallback to 15 minutes if no duration
       setProgress((currentTime / trackDuration) * 100)
       updateProgress() // Call update progress function
     }
@@ -24,7 +24,7 @@ const CurrentlyPlaying = () => {
       podcastId: 'cc01c37cc6b54nkjk5ebw5d3756fcae4cc9f0',
       episodeId,
       progress: currentTime,
-      totalLength: currentTrack.duration || 950 // Fallback to 15 minutes if no duration
+      totalLength: currentTrack.duration || 1500 // Fallback to 15 minutes if no duration
     }
 
     try {

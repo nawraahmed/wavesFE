@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { fetchTrendingPodcastsMock } from '../mockApi/mockApi'
+import { FaPlay, FaPlus, FaSearch } from 'react-icons/fa'
 
 const Discover = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [podcasts, setPodcasts] = useState([])
-  const [randomPodcast, setRandomPodcast] = useState(null) // New state for random podcast
+  const [searchResults, setSearchResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -32,13 +33,13 @@ const Discover = () => {
       const data = response.data
       if (data.results.length === 0) {
         setError('No podcasts found for your search.')
-        setPodcasts([])
+        setSearchResults([]) // Update search results state
       } else {
-        setPodcasts(data.results)
+        setSearchResults(data.results) // Store the search results
       }
     } catch (error) {
       setError('Error fetching podcasts: ' + error.message)
-      setPodcasts([])
+      setSearchResults([]) // Clear search results if there’s an error
     } finally {
       setLoading(false)
     }
@@ -57,7 +58,7 @@ const Discover = () => {
           }
         }
       )
-
+      console.log(response.data.podcasts)
       setPodcasts(response.data.podcasts)
     } catch (error) {
       if (error.response && error.response.status === 429) {
@@ -72,38 +73,8 @@ const Discover = () => {
     }
   }
 
-  // New function to fetch a random podcast
-  const fetchRandomPodcast = async () => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      const response = await axios.get(
-        'https://listen-api.listennotes.com/api/v2/just_listen',
-        {
-          headers: {
-            'X-ListenAPI-Key': apiKey
-          }
-        }
-      )
-
-      setRandomPodcast(response.data)
-    } catch (error) {
-      if (error.response && error.response.status === 429) {
-        console.log('Received status code 429. Using mock data instead.')
-        const mockData = await fetchTrendingPodcastsMock() // Replace with your actual mock data logic
-        setRandomPodcast(mockData.randomPodcast)
-      } else {
-        setError('Error fetching random podcast: ' + error.message)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
     fetchBestPodcasts()
-    fetchRandomPodcast() // Fetch random podcast when the component mounts
   }, [])
 
   const nextSlide = () => {
@@ -143,13 +114,105 @@ const Discover = () => {
     isDragging.current = false
   }
 
-  // Handle click events for the buttons (dummy handlers for now)
-  const handleFavoritePodcast = (podcast) => {
-    console.log('Favorite podcast:', podcast)
+  // Handle click events for the buttons
+  const handleFavoritePodcast = async (podcast) => {
+    console.log('Attempting to add podcast:', podcast.id)
+
+    try {
+      const mappedPodcast = {
+        externalId: podcast.id,
+        title: podcast.title,
+        description: podcast.description,
+        thumbnail: podcast.thumbnail,
+        genre_ids: podcast.genre_ids
+      }
+
+      const token = localStorage.getItem('authToken')
+      if (!token) {
+        console.error('No authentication token found. Cannot add podcast.')
+        return // Exit if there's no token
+      }
+
+      const res = await axios.post(
+        'http://localhost:4000/favorite',
+        mappedPodcast,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+      console.log('Podcast favorited:', res.data)
+    } catch (error) {
+      // Log the error details if the addition fails
+      if (error.response) {
+        console.error(
+          'Error adding podcast, response data:',
+          error.response.data
+        )
+        console.error('Error status code:', error.response.status)
+        console.error('Error headers:', error.response.headers)
+
+        // Check for a 409 status code
+        if (error.response.status === 409) {
+          toast.error('This podcast is already in your favorites!', {
+            autoClose: 3000 // Auto-close after 3 seconds
+          })
+        }
+      } else {
+        console.error('Error adding podcast:', error.message)
+      }
+    }
   }
 
-  const handleAddPodcast = (podcast) => {
-    console.log('Add podcast:', podcast)
+  const handleAddPodcast = async (podcast) => {
+    console.log('Attempting to add podcast:', podcast.podcast.id)
+    try {
+      const mappedPodcast = {
+        externalId: podcast.podcast.id,
+        title: podcast.podcast.title_original,
+        description: podcast.podcast.description_original,
+        thumbnail: podcast.podcast.thumbnail,
+        genre_ids: podcast.podcast.genre_ids
+      }
+
+      const token = localStorage.getItem('authToken')
+      if (!token) {
+        console.error('No authentication token found. Cannot add podcast.')
+        return // Exit if there's no token
+      }
+
+      const res = await axios.post(
+        'http://localhost:4000/addpodcast',
+        mappedPodcast,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      console.log('Podcast added successfully:', res.data)
+    } catch (error) {
+      // Log the error details if the addition fails
+      if (error.response) {
+        console.error(
+          'Error adding podcast, response data:',
+          error.response.data
+        )
+        console.error('Error status code:', error.response.status)
+        console.error('Error headers:', error.response.headers)
+
+        // Check for a 409 status code
+        if (error.response.status === 409) {
+          toast.error('This podcast is already in your list!', {
+            autoClose: 3000 // Auto-close after 3 seconds
+          })
+        }
+      } else {
+        console.error('Error adding podcast:', error.message)
+      }
+    }
   }
 
   const handlePlayClick = (podcast) => {
@@ -158,77 +221,75 @@ const Discover = () => {
 
   return (
     <div className="discover-container">
-      <h1 className="discover-title">Discover Podcasts</h1>
-
-      {/* Podcast Results */}
-      <div
-        className="podcast-carousel"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onMouseDown={handleTouchStart}
-        onMouseMove={handleTouchMove}
-        onMouseUp={handleTouchEnd}
-        style={{ cursor: 'grab' }}
-      >
+      <h1 className="discover-title">Trending Podcasts 🔥 </h1>
+      {/* Podcast Slideshow */}
+      <>
         <div
-          className="podcast-results"
-          style={{
-            transform: `translateX(-${(currentIndex / itemsPerSlide) * 100}%)`,
-            transition: 'transform 0.5s ease',
-            justifyContent: 'center'
-          }}
+          className="podcast-carousel"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleTouchStart}
+          onMouseMove={handleTouchMove}
+          onMouseUp={handleTouchEnd}
+          style={{ cursor: 'grab' }}
         >
-          {podcasts.map((podcast, index) => (
-            <div className="podcast-card" key={`${podcast.id}-${index}`}>
-              <div className="podcast-image-container">
-                <img
-                  src={podcast.thumbnail}
-                  alt={`${podcast.title_original} thumbnail`}
-                  className="podcast-thumbnail"
-                  onClick={() => handlePlayClick(podcast)}
-                />
-                <div className="podcast-buttons">
-                  <button
-                    className="like-button"
-                    onClick={() => handleFavoritePodcast(podcast)}
-                  >
-                    ❤️
-                  </button>
-                  <button
-                    className="add-button"
-                    onClick={() => handleAddPodcast(podcast)}
-                  >
-                    <FaPlus />
-                  </button>
-                  <button
-                    className="play-button"
+          <div
+            className="podcast-results"
+            style={{
+              transform: `translateX(-${
+                (currentIndex / itemsPerSlide) * 100
+              }%)`,
+              transition: 'transform 0.5s ease',
+              justifyContent: 'center'
+            }}
+          >
+            {podcasts.map((podcast, index) => (
+              <div className="podcast-card" key={`${podcast.id}-${index}`}>
+                <div className="podcast-image-container">
+                  <img
+                    src={podcast.thumbnail}
+                    alt={`${podcast.title_original} thumbnail`}
+                    className="podcast-thumbnail"
                     onClick={() => handlePlayClick(podcast)}
-                  >
-                    <FaPlay />
-                  </button>
+                  />
+                  <div className="podcast-buttons">
+                    <button
+                      className="like-button"
+                      onClick={() => handleFavoritePodcast(podcast)}
+                    >
+                      ❤️
+                    </button>
+                    <button
+                      className="add-button"
+                      onClick={() => handleAddPodcast(podcast)}
+                    >
+                      <FaPlus />
+                    </button>
+                  </div>
                 </div>
+                <div className="podcast-name">{podcast.title}</div>
               </div>
-              <div className="podcast-name">{podcast.title_original}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Button Section Below Podcast Cards */}
-      <div className="button-container">
-        {currentIndex > 0 && (
-          <button className="swap-button" onClick={prevSlide}>
-            &#60; {/* Left arrow */}
-          </button>
-        )}
-        {currentIndex + itemsPerSlide < podcasts.length && (
-          <button className="swap-button" onClick={nextSlide}>
-            &#62; {/* Right arrow */}
-          </button>
-        )}
-      </div>
-      {/* Search Input */}
+        {/* Button Section Below Podcast Cards */}
+        <div className="button-container">
+          {currentIndex > 0 && (
+            <button className="swap-button" onClick={prevSlide}>
+              &#60; {/* Left arrow */}
+            </button>
+          )}
+          {currentIndex + itemsPerSlide < podcasts.length && (
+            <button className="swap-button" onClick={nextSlide}>
+              &#62; {/* Right arrow */}
+            </button>
+          )}
+        </div>
+      </>
+
+      {/* Search Input - Now placed below the slideshow */}
       <div className="search-bar">
         <input
           type="text"
@@ -236,24 +297,55 @@ const Discover = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button onClick={handleSearch}>Search</button>
+        <button className="like-button" onClick={handleSearch}>
+          <FaSearch />
+        </button>
       </div>
-
       {/* Error Message */}
       {error && <div className="error-message">{error}</div>}
-
       {/* Loading Indicator */}
       {loading && <div>Loading podcasts...</div>}
-
-      {/* Random Podcast Display */}
-      {randomPodcast && (
-        <div className="random-podcast">
-          <h2>Random Podcast:</h2>
-          <h3>{randomPodcast.title}</h3>
-          <audio controls>
-            <source src={randomPodcast.audio_url} type="audio/mpeg" />
-            Your browser does not support the audio tag.
-          </audio>
+      {/* Search Results */}
+      {searchResults.length > 0 && (
+        <div className="search-results">
+          <h2>Search Results</h2>
+          <div className="podcast-grid">
+            {' '}
+            {/* Replaced podcast-list with podcast-grid */}
+            {searchResults.map((podcast, index) => (
+              <div className="podcast-card" key={`${podcast.id}-${index}`}>
+                <div className="podcast-image-container">
+                  <img
+                    src={podcast.thumbnail}
+                    alt={`${podcast.title_original} thumbnail`}
+                    className="podcast-thumbnail"
+                    onClick={() => handlePlayClick(podcast)}
+                  />
+                  <div className="podcast-buttons">
+                    <button
+                      className="like-button"
+                      onClick={() => handleFavoritePodcast(podcast)}
+                    >
+                      ❤️
+                    </button>
+                    <button
+                      className="add-button"
+                      onClick={() => handleAddPodcast(podcast)}
+                    >
+                      <FaPlus />
+                    </button>
+                    <button
+                      className="play-button"
+                      onClick={() => handlePlayClick(podcast)}
+                    >
+                      <FaPlay />
+                    </button>
+                  </div>
+                </div>
+                <div className="podcast-name">{podcast.title_original}</div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
